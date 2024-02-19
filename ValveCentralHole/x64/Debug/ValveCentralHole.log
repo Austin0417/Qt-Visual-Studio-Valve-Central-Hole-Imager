@@ -1,0 +1,4 @@
+﻿  CalibrateWidget.cpp
+C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\CalibrateWidget.cpp(81,14): warning C4858: discarding return value: The result of 'std::async' should be stored in a variable. If the return value is discarded, the temporary 'std::future' is destroyed, waiting for an async result or evaluating a deferred result, thus defeating the purpose of 'std::async'.
+C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\CalibrateWidget.cpp(120,18): warning C4858: discarding return value: The result of 'std::async' should be stored in a variable. If the return value is discarded, the temporary 'std::future' is destroyed, waiting for an async result or evaluating a deferred result, thus defeating the purpose of 'std::async'.
+  ValveCentralHole.vcxproj -> C:\Users\Austin Luu\source\repos\ValveCentralHole\x64\Debug\ValveCentralHole.exe
