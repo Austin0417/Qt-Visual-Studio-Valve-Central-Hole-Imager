@@ -12,6 +12,7 @@
 #include <QVBoxLayout>
 #include <QSpinBox>
 #include <QLabel>
+#include <QSlider>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
@@ -55,6 +56,7 @@ public:
 	static CurrentUnitSelection current_unit_selection_;
 
 signals:
+	void UpdatePreviewMat();
 	void OnCalibrationComplete(double calibration_factor);
 
 private:
@@ -66,10 +68,12 @@ private:
 	int threshold_value_ = 127;
 	static double calibration_factor_;
 	QString selected_image_filename_;
+	bool isCurrentlyShowingPreview = false;
 
 	std::unique_ptr<QDoubleSpinBox> diameter_input_;
 	std::unique_ptr<QComboBox> diameter_unit_selection_;
-	std::unique_ptr<QSpinBox> threshold_input_;
+	std::unique_ptr<QSlider> threshold_input_slider_;
+	std::unique_ptr<QLabel> threshold_value_label_;
 	std::unique_ptr<QFileDialog> file_select_;
 	std::unique_ptr<QPushButton> select_file_button_;
 	std::unique_ptr<QVBoxLayout> widget_layout_;
@@ -81,5 +85,6 @@ private:
 
 	void InitializeUIElements();
 	void ConnectEventListeners();
+	void DisplayPreviewMat();
 };
 

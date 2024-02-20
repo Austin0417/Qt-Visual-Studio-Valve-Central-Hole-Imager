@@ -24,6 +24,7 @@ public:
 	void SetPreviewMat(Mat preview_mat);
 
 signals:
+	void UpdatePreviewMat();
 	void onAreaCalculationComplete(double valve_area);
 
 private:
@@ -31,6 +32,7 @@ private:
 	int threshold_value_ = 127;
 	Mat current_image_mat_;
 	Mat binarized_image_preview_mat_;
+	bool isCurrentlyShowingPreview = false;
 
 	std::unique_ptr<QLabel> calibration_factor_label_;
 	std::unique_ptr<QPushButton> select_valve_image_;
@@ -39,9 +41,11 @@ private:
 	std::unique_ptr<QLabel> original_image_;
 	std::unique_ptr<QLabel> binarized_image_;
 	std::unique_ptr<QLabel> calculated_area_label_;
-	std::unique_ptr<QSpinBox> threshold_value_input_;
+	std::unique_ptr<QSlider> threshold_value_slider_;
+	std::unique_ptr<QLabel> threshold_value_display_label_;
 	std::unique_ptr<QFileDialog> file_dialog_;
 
 	void InitializeUIElements();
 	void ConnectEventListeners();
+	void DisplayPreviewMat();
 };
