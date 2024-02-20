@@ -16,7 +16,7 @@
   <widget class="QLabel" name="current_calibration_factor">
    <property name="geometry">
     <rect>
-     <x>730</x>
+     <x>610</x>
      <y>0</y>
      <width>831</width>
      <height>61</height>
@@ -74,7 +74,7 @@
     <string notr="true">font-size: 25px; color: black;</string>
    </property>
    <property name="text">
-    <string>Binarized</string>
+    <string>Binary</string>
    </property>
   </widget>
   <widget class="QLabel" name="original_valve">
@@ -144,8 +144,8 @@
   <widget class="QLabel" name="valve_area_label">
    <property name="geometry">
     <rect>
-     <x>610</x>
-     <y>320</y>
+     <x>650</x>
+     <y>300</y>
      <width>781</width>
      <height>51</height>
     </rect>
@@ -157,23 +157,10 @@
     <string>Calculated Valve Area: </string>
    </property>
   </widget>
-  <widget class="QSpinBox" name="valve_threshold_input">
-   <property name="geometry">
-    <rect>
-     <x>1010</x>
-     <y>90</y>
-     <width>151</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background: white;</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>730</x>
+     <x>610</x>
      <y>90</y>
      <width>261</width>
      <height>31</height>
@@ -184,6 +171,35 @@
    </property>
    <property name="text">
     <string>Threshold Value:</string>
+   </property>
+  </widget>
+  <widget class="QSlider" name="threshold_value_slider">
+   <property name="geometry">
+    <rect>
+     <x>880</x>
+     <y>100</y>
+     <width>160</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="threshold_value_display">
+   <property name="geometry">
+    <rect>
+     <x>1060</x>
+     <y>80</y>
+     <width>151</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font-size: 30px;</string>
+   </property>
+   <property name="text">
+    <string>127</string>
    </property>
   </widget>
  </widget>

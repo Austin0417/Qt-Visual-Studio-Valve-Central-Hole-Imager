@@ -13,7 +13,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QSpinBox>
+#include <QtWidgets/QSlider>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -30,8 +30,9 @@ public:
     QPushButton *preview_btn;
     QPushButton *measure_btn;
     QLabel *valve_area_label;
-    QSpinBox *valve_threshold_input;
     QLabel *label;
+    QSlider *threshold_value_slider;
+    QLabel *threshold_value_display;
 
     void setupUi(QWidget *MeasureWidget)
     {
@@ -40,7 +41,7 @@ public:
         MeasureWidget->resize(1920, 1080);
         current_calibration_factor = new QLabel(MeasureWidget);
         current_calibration_factor->setObjectName("current_calibration_factor");
-        current_calibration_factor->setGeometry(QRect(730, 0, 831, 61));
+        current_calibration_factor->setGeometry(QRect(610, 0, 831, 61));
         current_calibration_factor->setStyleSheet(QString::fromUtf8("font-size: 35px; color: lightgreen; font-weight: bold;"));
         select_valve_image = new QPushButton(MeasureWidget);
         select_valve_image->setObjectName("select_valve_image");
@@ -72,16 +73,20 @@ public:
         measure_btn->setStyleSheet(QString::fromUtf8("background: white;"));
         valve_area_label = new QLabel(MeasureWidget);
         valve_area_label->setObjectName("valve_area_label");
-        valve_area_label->setGeometry(QRect(610, 320, 781, 51));
+        valve_area_label->setGeometry(QRect(650, 300, 781, 51));
         valve_area_label->setStyleSheet(QString::fromUtf8("font-size: 35px; color: black; color: brown; font-weight: bold;"));
-        valve_threshold_input = new QSpinBox(MeasureWidget);
-        valve_threshold_input->setObjectName("valve_threshold_input");
-        valve_threshold_input->setGeometry(QRect(1010, 90, 151, 41));
-        valve_threshold_input->setStyleSheet(QString::fromUtf8("background: white;"));
         label = new QLabel(MeasureWidget);
         label->setObjectName("label");
-        label->setGeometry(QRect(730, 90, 261, 31));
+        label->setGeometry(QRect(610, 90, 261, 31));
         label->setStyleSheet(QString::fromUtf8("font-size: 35px; color: black;"));
+        threshold_value_slider = new QSlider(MeasureWidget);
+        threshold_value_slider->setObjectName("threshold_value_slider");
+        threshold_value_slider->setGeometry(QRect(880, 100, 160, 22));
+        threshold_value_slider->setOrientation(Qt::Horizontal);
+        threshold_value_display = new QLabel(MeasureWidget);
+        threshold_value_display->setObjectName("threshold_value_display");
+        threshold_value_display->setGeometry(QRect(1060, 80, 151, 41));
+        threshold_value_display->setStyleSheet(QString::fromUtf8("font-size: 30px;"));
 
         retranslateUi(MeasureWidget);
 
@@ -94,13 +99,14 @@ public:
         current_calibration_factor->setText(QCoreApplication::translate("MeasureWidget", "Calibration Factor: ", nullptr));
         select_valve_image->setText(QCoreApplication::translate("MeasureWidget", "Select Valve Image", nullptr));
         label_2->setText(QCoreApplication::translate("MeasureWidget", "Original", nullptr));
-        label_4->setText(QCoreApplication::translate("MeasureWidget", "Binarized", nullptr));
+        label_4->setText(QCoreApplication::translate("MeasureWidget", "Binary", nullptr));
         original_valve->setText(QString());
         binarized_valve->setText(QString());
         preview_btn->setText(QCoreApplication::translate("MeasureWidget", "Preview", nullptr));
         measure_btn->setText(QCoreApplication::translate("MeasureWidget", "Measure", nullptr));
         valve_area_label->setText(QCoreApplication::translate("MeasureWidget", "Calculated Valve Area: ", nullptr));
         label->setText(QCoreApplication::translate("MeasureWidget", "Threshold Value:", nullptr));
+        threshold_value_display->setText(QCoreApplication::translate("MeasureWidget", "127", nullptr));
     } // retranslateUi
 
 };

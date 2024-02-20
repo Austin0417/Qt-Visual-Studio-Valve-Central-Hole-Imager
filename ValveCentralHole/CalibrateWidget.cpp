@@ -13,11 +13,17 @@ CurrentUnitSelection CalibrateWidget::current_unit_selection_ = CurrentUnitSelec
  * \brief
  * \param calibrate_widget [in]: reference to calling CalibrateWidget instance
  * \param original_mat [in] : Original, input matrix from the image file selected by the user
+ * \param is_update [in] : set to true only if the function is used to update preview image as a result of the threshold slider being moved
  */
-static void CreateBinaryImagePreview(CalibrateWidget& calibrate_widget, const Mat& original_mat) {
+static void CreateBinaryImagePreview(CalibrateWidget& calibrate_widget, const Mat& original_mat, bool is_update) {
 	Mat temp = original_mat.clone();
 	BinarizeImageHelper::BinarizeImage(temp, calibrate_widget.GetThresholdValue(), ThresholdMode::INVERTED);
 	calibrate_widget.SetPreviewMat(temp);
+
+	if (is_update)
+	{
+		emit calibrate_widget.UpdatePreviewMat();
+	}
 }
 
 QString GetUnitSuffix(CurrentUnitSelection unit_selection_)
@@ -64,12 +70,37 @@ double CalibrateWidget::GetCalibrationFactor() {
 	return calibration_factor_;
 }
 
+void CalibrateWidget::DisplayPreviewMat()
+{
+	if (binarized_preview_image_mat_.empty())
+	{
+		MessageBoxHelper::ShowErrorDialog("Select an input image first");
+		return;
+	}
+
+	QImage preview_image(binarized_preview_image_mat_.data, binarized_preview_image_mat_.cols, binarized_preview_image_mat_.rows, QImage::Format_Grayscale8);
+	if (preview_image.isNull())
+	{
+		qDebug() << "Error converting binary image into QImage object";
+		return;
+	}
+
+	QPixmap preview_pixmap = QPixmap::fromImage(preview_image);
+	if (preview_pixmap.isNull())
+	{
+		qDebug() << "Error converting QImage into QPixmap";
+		return;
+	}
+	binarized_image_->setPixmap(preview_pixmap.scaled(QSize(IMAGE_WIDTH, IMAGE_HEIGHT)));
+}
+
 
 void CalibrateWidget::InitializeUIElements()
 {
 	diameter_input_.reset(ui->diameter_input);
 	diameter_unit_selection_.reset(ui->diameter_unit_selection);
-	threshold_input_.reset(ui->threshold_input);
+	threshold_input_slider_.reset(ui->threshold_value_slider);
+	threshold_value_label_.reset(ui->threshold_value_display);
 	select_file_button_.reset(ui->select_image_file);
 	original_image_.reset(ui->original_image);
 	binarized_image_.reset(ui->binarized_image);
@@ -81,19 +112,21 @@ void CalibrateWidget::InitializeUIElements()
 	diameter_unit_selection_->addItem("mm");
 	diameter_unit_selection_->addItem("in");
 
+	threshold_input_slider_->setMinimum(0);
+	threshold_input_slider_->setMaximum(255);
+	threshold_input_slider_->setSingleStep(1);
+	threshold_input_slider_->setValue(127);
+
 	diameter_input_->setMinimum(0);
 	diameter_input_->setMaximum(1000000);
 	diameter_input_->setDecimals(5);
-	threshold_input_->setMinimum(0);
-	threshold_input_->setMaximum(255);
-	threshold_input_->setValue(127);
 
 	file_select_->setStyleSheet("background: white;");
 }
 
+// Add event listeners
 void CalibrateWidget::ConnectEventListeners()
 {
-	// Add event listeners
 	connect(diameter_input_.get(), &QDoubleSpinBox::valueChanged, this, [this](double new_value) {
 		qDebug() << "Inputted Diameter: " << new_value;
 		gauge_diameter_ = new_value;
@@ -121,13 +154,22 @@ void CalibrateWidget::ConnectEventListeners()
 			diameter_input_->setValue(gauge_diameter_);
 		});
 
-	connect(threshold_input_.get(), &QSpinBox::valueChanged, this, [this](int new_value) {
-		qDebug() << "Inputted threshold value: " << new_value;
-		threshold_value_ = new_value;
-		if (!current_image_mat_.empty())
+	connect(threshold_input_slider_.get(), &QAbstractSlider::sliderMoved, this, [this](int value)
 		{
-			auto thread_handle = std::async(std::launch::async, &CreateBinaryImagePreview, std::ref(*this), std::ref(current_image_mat_));
-		}
+			threshold_value_ = value;
+			qDebug() << "Slider value changed: " << value;
+			threshold_value_label_->setText(QString::number(threshold_value_));
+
+			// When the slider is moved, we want to update the preview image if it is currently shown
+			if (!current_image_mat_.empty() && !binarized_preview_image_mat_.empty() && isCurrentlyShowingPreview)
+			{
+				std::future<void> thread_handle = std::async(std::launch::async, &CreateBinaryImagePreview, std::ref(*this), std::ref(current_image_mat_), true);
+			}
+		});
+
+	connect(this, &CalibrateWidget::UpdatePreviewMat, this, [this]()
+		{
+			DisplayPreviewMat();
 		});
 
 	connect(select_file_button_.get(), &QPushButton::clicked, this, [this]() {
@@ -154,31 +196,13 @@ void CalibrateWidget::ConnectEventListeners()
 		original_image_->setPixmap(scaled);
 
 		// Binarize the selected image on a separate thread to have it ready for preview
-		auto thread_handle = std::async(std::launch::async, &CreateBinaryImagePreview, std::ref(*this), std::ref(current_image_mat_));
+		auto thread_handle = std::async(std::launch::async, &CreateBinaryImagePreview, std::ref(*this), std::ref(current_image_mat_), false);
 		});
 
 	// When the preview button is pressed, we only want to binarize the input image for previewing (don't perform any calibration work yet)
 	connect(preview_btn_.get(), &QPushButton::clicked, this, [this]() {
-		if (binarized_preview_image_mat_.empty())
-		{
-			MessageBoxHelper::ShowErrorDialog("Select an input image first");
-			return;
-		}
-
-		QImage preview_image(binarized_preview_image_mat_.data, binarized_preview_image_mat_.cols, binarized_preview_image_mat_.rows, QImage::Format_Grayscale8);
-		if (preview_image.isNull())
-		{
-			qDebug() << "Error converting binary image into QImage object";
-			return;
-		}
-
-		QPixmap preview_pixmap = QPixmap::fromImage(preview_image);
-		if (preview_pixmap.isNull())
-		{
-			qDebug() << "Error converting QImage into QPixmap";
-			return;
-		}
-		binarized_image_->setPixmap(preview_pixmap.scaled(QSize(IMAGE_WIDTH, IMAGE_HEIGHT)));
+		isCurrentlyShowingPreview = true;
+		DisplayPreviewMat();
 		});
 
 	connect(calibrate_btn_.get(), &QPushButton::clicked, this, [this]() {
