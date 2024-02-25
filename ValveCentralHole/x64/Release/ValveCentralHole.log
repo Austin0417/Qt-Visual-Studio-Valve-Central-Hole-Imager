@@ -1,6 +1,2 @@
-﻿  MeasureWidget.cpp
-  ValveCentralHole.cpp
-  main.cpp
-  moc_MeasureWidget.cpp
-  moc_ValveCentralHole.cpp
+﻿  ValveCentralHole.cpp
   ValveCentralHole.vcxproj -> C:\Users\Austin Luu\source\repos\ValveCentralHole\x64\Release\ValveCentralHole.exe

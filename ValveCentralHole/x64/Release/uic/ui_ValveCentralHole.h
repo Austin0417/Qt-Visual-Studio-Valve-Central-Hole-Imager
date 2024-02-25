@@ -26,7 +26,7 @@ public:
     QTabWidget *tab_widget;
     QWidget *tab;
     QWidget *tab_2;
-    QMenuBar *menubar;
+    QMenuBar *options_menu;
     QStatusBar *statusbar;
 
     void setupUi(QMainWindow *ValveCentralHoleClass)
@@ -47,15 +47,18 @@ public:
         tab_2->setObjectName("tab_2");
         tab_widget->addTab(tab_2, QString());
         ValveCentralHoleClass->setCentralWidget(centralwidget);
-        menubar = new QMenuBar(ValveCentralHoleClass);
-        menubar->setObjectName("menubar");
-        menubar->setGeometry(QRect(0, 0, 1280, 22));
-        ValveCentralHoleClass->setMenuBar(menubar);
+        options_menu = new QMenuBar(ValveCentralHoleClass);
+        options_menu->setObjectName("options_menu");
+        options_menu->setGeometry(QRect(0, 0, 1280, 22));
+        ValveCentralHoleClass->setMenuBar(options_menu);
         statusbar = new QStatusBar(ValveCentralHoleClass);
         statusbar->setObjectName("statusbar");
         ValveCentralHoleClass->setStatusBar(statusbar);
 
         retranslateUi(ValveCentralHoleClass);
+
+        tab_widget->setCurrentIndex(0);
+
 
         QMetaObject::connectSlotsByName(ValveCentralHoleClass);
     } // setupUi

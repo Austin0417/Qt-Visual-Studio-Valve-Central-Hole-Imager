@@ -4,8 +4,12 @@
 void ValveCentralHole::InitializeUIElements() {
 	// Initialize Tab Widget and add the necessary tabs
 	tab_widget.reset(ui.tab_widget);
+	menu_bar_.reset(ui.options_menu);
 	calibrate_tab_ = std::make_unique<CalibrateWidget>(this);
 	measure_tab_ = std::make_unique<MeasureWidget>(this);
+
+	options_menu_.reset(menu_bar_->addMenu("Options"));
+	options_actions_.push_back(options_menu_->addAction("Helper Gauge Diameter Measure Tool"));
 
 	// Removing the starting tabs from the QTabWidget
 	tab_widget->clear();
@@ -26,6 +30,11 @@ void ValveCentralHole::ConnectEventListeners() {
 		{
 			measure_tab_->RefreshCalibrationFactor();
 		}
+		});
+
+	connect(options_menu_.get(), &QMenu::triggered, this, [this](QAction* triggered)
+		{
+			qDebug() << "Activated action: " << triggered->text();
 		});
 }
 

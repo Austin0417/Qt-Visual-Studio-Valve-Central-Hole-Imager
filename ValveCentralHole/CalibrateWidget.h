@@ -73,6 +73,8 @@ private:
 	std::unique_ptr<QDoubleSpinBox> diameter_input_;
 	std::unique_ptr<QComboBox> diameter_unit_selection_;
 	std::unique_ptr<QSlider> threshold_input_slider_;
+	std::unique_ptr<QComboBox> threshold_mode_combo_box_;
+	std::unique_ptr<QCheckBox> is_saline_checkbox_;
 	std::unique_ptr<QLabel> threshold_value_label_;
 	std::unique_ptr<QFileDialog> file_select_;
 	std::unique_ptr<QPushButton> select_file_button_;
@@ -82,9 +84,12 @@ private:
 	std::unique_ptr<QPushButton> preview_btn_;
 	std::unique_ptr<QPushButton> calibrate_btn_;
 	std::unique_ptr<QLabel> calibration_factor_label_;
+	std::unique_ptr<QLabel> threshold_mode_tooltip_label_;
+	std::unique_ptr<QLabel> saline_tooltip_label_;
 
 	void InitializeUIElements();
 	void ConnectEventListeners();
 	void DisplayPreviewMat();
+	void DisplayCalibrationFactor();
 };
 

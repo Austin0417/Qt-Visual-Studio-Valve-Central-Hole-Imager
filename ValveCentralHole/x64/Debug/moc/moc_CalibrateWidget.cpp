@@ -40,7 +40,7 @@ namespace {
 struct qt_meta_stringdata_CLASSCalibrateWidgetENDCLASS_t {};
 constexpr auto qt_meta_stringdata_CLASSCalibrateWidgetENDCLASS = QtMocHelpers::stringData(
     "CalibrateWidget",
-    "PreviewRequested",
+    "UpdatePreviewMat",
     "",
     "OnCalibrationComplete",
     "calibration_factor"
@@ -59,13 +59,13 @@ struct qt_meta_stringdata_CLASSCalibrateWidgetENDCLASS_t {
 Q_CONSTINIT static const qt_meta_stringdata_CLASSCalibrateWidgetENDCLASS_t qt_meta_stringdata_CLASSCalibrateWidgetENDCLASS = {
     {
         QT_MOC_LITERAL(0, 15),  // "CalibrateWidget"
-        QT_MOC_LITERAL(16, 16),  // "PreviewRequested"
+        QT_MOC_LITERAL(16, 16),  // "UpdatePreviewMat"
         QT_MOC_LITERAL(33, 0),  // ""
         QT_MOC_LITERAL(34, 21),  // "OnCalibrationComplete"
         QT_MOC_LITERAL(56, 18)   // "calibration_factor"
     },
     "CalibrateWidget",
-    "PreviewRequested",
+    "UpdatePreviewMat",
     "",
     "OnCalibrationComplete",
     "calibration_factor"
@@ -107,7 +107,7 @@ Q_CONSTINIT const QMetaObject CalibrateWidget::staticMetaObject = { {
     qt_incomplete_metaTypeArray<qt_meta_stringdata_CLASSCalibrateWidgetENDCLASS_t,
         // Q_OBJECT / Q_GADGET
         QtPrivate::TypeAndForceComplete<CalibrateWidget, std::true_type>,
-        // method 'PreviewRequested'
+        // method 'UpdatePreviewMat'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'OnCalibrationComplete'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
@@ -122,7 +122,7 @@ void CalibrateWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
         auto *_t = static_cast<CalibrateWidget *>(_o);
         (void)_t;
         switch (_id) {
-        case 0: _t->PreviewRequested(); break;
+        case 0: _t->UpdatePreviewMat(); break;
         case 1: _t->OnCalibrationComplete((*reinterpret_cast< std::add_pointer_t<double>>(_a[1]))); break;
         default: ;
         }
@@ -130,7 +130,7 @@ void CalibrateWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
         int *result = reinterpret_cast<int *>(_a[0]);
         {
             using _t = void (CalibrateWidget::*)();
-            if (_t _q_method = &CalibrateWidget::PreviewRequested; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
+            if (_t _q_method = &CalibrateWidget::UpdatePreviewMat; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
                 *result = 0;
                 return;
             }
@@ -176,7 +176,7 @@ int CalibrateWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void CalibrateWidget::PreviewRequested()
+void CalibrateWidget::UpdatePreviewMat()
 {
     QMetaObject::activate(this, &staticMetaObject, 0, nullptr);
 }

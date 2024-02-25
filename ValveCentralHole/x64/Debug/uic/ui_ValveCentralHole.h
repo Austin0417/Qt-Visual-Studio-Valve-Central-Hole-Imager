@@ -33,12 +33,13 @@ public:
     {
         if (ValveCentralHoleClass->objectName().isEmpty())
             ValveCentralHoleClass->setObjectName("ValveCentralHoleClass");
-        ValveCentralHoleClass->resize(1920, 1080);
+        ValveCentralHoleClass->resize(1280, 720);
         centralwidget = new QWidget(ValveCentralHoleClass);
         centralwidget->setObjectName("centralwidget");
         tab_widget = new QTabWidget(centralwidget);
         tab_widget->setObjectName("tab_widget");
-        tab_widget->setGeometry(QRect(0, 0, 1911, 1051));
+        tab_widget->setGeometry(QRect(0, 0, 1280, 720));
+        tab_widget->setStyleSheet(QString::fromUtf8("background: gray;"));
         tab = new QWidget();
         tab->setObjectName("tab");
         tab_widget->addTab(tab, QString());
@@ -48,7 +49,7 @@ public:
         ValveCentralHoleClass->setCentralWidget(centralwidget);
         menubar = new QMenuBar(ValveCentralHoleClass);
         menubar->setObjectName("menubar");
-        menubar->setGeometry(QRect(0, 0, 1920, 22));
+        menubar->setGeometry(QRect(0, 0, 1280, 22));
         ValveCentralHoleClass->setMenuBar(menubar);
         statusbar = new QStatusBar(ValveCentralHoleClass);
         statusbar->setObjectName("statusbar");

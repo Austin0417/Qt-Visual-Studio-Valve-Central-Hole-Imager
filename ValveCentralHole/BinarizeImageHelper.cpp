@@ -89,3 +89,17 @@ double BinarizeImageHelper::CalculateValveArea(unsigned long long number_on_pixe
 	return number_on_pixels * calibration_factor;
 }
 
+void BinarizeImageHelper::InvertBinaryImage(Mat& mat)
+{
+	bitwise_xor(mat, Scalar(255), mat);
+}
+
+
+double BinarizeImageHelper::ApplySalineTransformation(double calibration_factor)
+{
+	// TODO Figure out how to adjust for the saline index of refraction here
+
+
+	return calibration_factor;
+}
+

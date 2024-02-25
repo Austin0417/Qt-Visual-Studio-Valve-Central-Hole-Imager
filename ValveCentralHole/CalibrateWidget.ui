@@ -64,7 +64,7 @@
   <widget class="QPushButton" name="select_image_file">
    <property name="geometry">
     <rect>
-     <x>590</x>
+     <x>470</x>
      <y>110</y>
      <width>151</width>
      <height>31</height>
@@ -144,7 +144,7 @@
   <widget class="QPushButton" name="preview_btn">
    <property name="geometry">
     <rect>
-     <x>590</x>
+     <x>470</x>
      <y>140</y>
      <width>151</width>
      <height>31</height>
@@ -160,7 +160,7 @@
   <widget class="QPushButton" name="calibrate_btn">
    <property name="geometry">
     <rect>
-     <x>590</x>
+     <x>470</x>
      <y>170</y>
      <width>151</width>
      <height>31</height>
@@ -229,6 +229,71 @@
    </property>
    <property name="text">
     <string>127</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="is_saline_selection">
+   <property name="geometry">
+    <rect>
+     <x>770</x>
+     <y>150</y>
+     <width>76</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Saline</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="threshold_mode_selection">
+   <property name="geometry">
+    <rect>
+     <x>770</x>
+     <y>110</y>
+     <width>101</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background: white</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>670</x>
+     <y>110</y>
+     <width>91</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Threshold Mode:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="threshold_mode_tooltip_">
+   <property name="geometry">
+    <rect>
+     <x>880</x>
+     <y>110</y>
+     <width>21</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="saline_tooltip">
+   <property name="geometry">
+    <rect>
+     <x>830</x>
+     <y>150</y>
+     <width>21</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
    </property>
   </widget>
  </widget>
