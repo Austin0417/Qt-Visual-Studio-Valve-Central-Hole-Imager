@@ -22,8 +22,8 @@
 #include <memory>
 
 
-constexpr int IMAGE_WIDTH = 930;
-constexpr int IMAGE_HEIGHT = 510;
+constexpr int IMAGE_WIDTH = 610;
+constexpr int IMAGE_HEIGHT = 330;
 
 using namespace cv;
 

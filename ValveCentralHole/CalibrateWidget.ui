@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1920</width>
-    <height>1080</height>
+    <width>1256</width>
+    <height>720</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,14 +19,14 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>660</x>
+     <x>360</x>
      <y>0</y>
      <width>281</width>
      <height>61</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">font-size: 35px; color: black;</string>
+    <string notr="true">font-size: 25px; color: black;</string>
    </property>
    <property name="text">
     <string>Gauge Diameter:</string>
@@ -35,10 +35,10 @@
   <widget class="QDoubleSpinBox" name="diameter_input">
    <property name="geometry">
     <rect>
-     <x>940</x>
-     <y>10</y>
-     <width>151</width>
-     <height>41</height>
+     <x>560</x>
+     <y>20</y>
+     <width>111</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -48,14 +48,14 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>660</x>
-     <y>100</y>
+     <x>360</x>
+     <y>50</y>
      <width>261</width>
      <height>61</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">font-size: 35px; color: black;</string>
+    <string notr="true">font-size: 25px; color: black;</string>
    </property>
    <property name="text">
     <string>Threshold Value:</string>
@@ -64,8 +64,8 @@
   <widget class="QPushButton" name="select_image_file">
    <property name="geometry">
     <rect>
-     <x>870</x>
-     <y>160</y>
+     <x>590</x>
+     <y>110</y>
      <width>151</width>
      <height>31</height>
     </rect>
@@ -81,9 +81,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>330</y>
-     <width>930</width>
-     <height>510</height>
+     <y>220</y>
+     <width>610</width>
+     <height>330</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -96,8 +96,8 @@
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>420</x>
-     <y>270</y>
+     <x>270</x>
+     <y>170</y>
      <width>91</width>
      <height>41</height>
     </rect>
@@ -112,10 +112,10 @@
   <widget class="QLabel" name="binarized_image">
    <property name="geometry">
     <rect>
-     <x>970</x>
-     <y>330</y>
-     <width>930</width>
-     <height>510</height>
+     <x>640</x>
+     <y>220</y>
+     <width>610</width>
+     <height>330</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -128,8 +128,8 @@
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
-     <x>1430</x>
-     <y>280</y>
+     <x>930</x>
+     <y>180</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -144,8 +144,8 @@
   <widget class="QPushButton" name="preview_btn">
    <property name="geometry">
     <rect>
-     <x>870</x>
-     <y>200</y>
+     <x>590</x>
+     <y>140</y>
      <width>151</width>
      <height>31</height>
     </rect>
@@ -160,8 +160,8 @@
   <widget class="QPushButton" name="calibrate_btn">
    <property name="geometry">
     <rect>
-     <x>870</x>
-     <y>240</y>
+     <x>590</x>
+     <y>170</y>
      <width>151</width>
      <height>31</height>
     </rect>
@@ -176,10 +176,10 @@
   <widget class="QLabel" name="calibration_factor_label">
    <property name="geometry">
     <rect>
-     <x>710</x>
-     <y>840</y>
+     <x>300</x>
+     <y>560</y>
      <width>881</width>
-     <height>81</height>
+     <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -192,10 +192,10 @@
   <widget class="QComboBox" name="diameter_unit_selection">
    <property name="geometry">
     <rect>
-     <x>1090</x>
-     <y>10</y>
-     <width>91</width>
-     <height>41</height>
+     <x>670</x>
+     <y>20</y>
+     <width>71</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -205,8 +205,8 @@
   <widget class="QSlider" name="threshold_value_slider">
    <property name="geometry">
     <rect>
-     <x>930</x>
-     <y>120</y>
+     <x>560</x>
+     <y>70</y>
      <width>160</width>
      <height>22</height>
     </rect>
@@ -218,14 +218,14 @@
   <widget class="QLabel" name="threshold_value_display">
    <property name="geometry">
     <rect>
-     <x>1110</x>
-     <y>110</y>
+     <x>740</x>
+     <y>60</y>
      <width>71</width>
      <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">font-size: 30px;</string>
+    <string notr="true">font-size: 25px;</string>
    </property>
    <property name="text">
     <string>127</string>

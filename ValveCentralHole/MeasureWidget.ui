@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1920</width>
-    <height>1080</height>
+    <width>1280</width>
+    <height>720</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,14 +16,14 @@
   <widget class="QLabel" name="current_calibration_factor">
    <property name="geometry">
     <rect>
-     <x>610</x>
+     <x>360</x>
      <y>0</y>
      <width>831</width>
-     <height>61</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">font-size: 35px; color: lightgreen; font-weight: bold;</string>
+    <string notr="true">font-size: 25px; color: lightgreen; font-weight: bold;</string>
    </property>
    <property name="text">
     <string>Calibration Factor: </string>
@@ -32,10 +32,10 @@
   <widget class="QPushButton" name="select_valve_image">
    <property name="geometry">
     <rect>
-     <x>890</x>
-     <y>150</y>
-     <width>161</width>
-     <height>41</height>
+     <x>580</x>
+     <y>100</y>
+     <width>151</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -48,8 +48,8 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>390</x>
-     <y>360</y>
+     <x>260</x>
+     <y>180</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -64,8 +64,8 @@
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>1390</x>
-     <y>370</y>
+     <x>930</x>
+     <y>180</y>
      <width>111</width>
      <height>31</height>
     </rect>
@@ -81,9 +81,9 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>410</y>
-     <width>930</width>
-     <height>510</height>
+     <y>220</y>
+     <width>610</width>
+     <height>330</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -96,10 +96,10 @@
   <widget class="QLabel" name="binarized_valve">
    <property name="geometry">
     <rect>
-     <x>970</x>
-     <y>410</y>
-     <width>930</width>
-     <height>510</height>
+     <x>650</x>
+     <y>220</y>
+     <width>610</width>
+     <height>330</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -112,10 +112,10 @@
   <widget class="QPushButton" name="preview_btn">
    <property name="geometry">
     <rect>
-     <x>890</x>
-     <y>200</y>
-     <width>161</width>
-     <height>41</height>
+     <x>580</x>
+     <y>130</y>
+     <width>151</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -128,10 +128,10 @@
   <widget class="QPushButton" name="measure_btn">
    <property name="geometry">
     <rect>
-     <x>890</x>
-     <y>250</y>
-     <width>161</width>
-     <height>41</height>
+     <x>580</x>
+     <y>160</y>
+     <width>151</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -144,10 +144,10 @@
   <widget class="QLabel" name="valve_area_label">
    <property name="geometry">
     <rect>
-     <x>650</x>
-     <y>300</y>
+     <x>220</x>
+     <y>560</y>
      <width>781</width>
-     <height>51</height>
+     <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -160,14 +160,14 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>610</x>
-     <y>90</y>
+     <x>360</x>
+     <y>50</y>
      <width>261</width>
      <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">font-size: 35px; color: black;</string>
+    <string notr="true">font-size: 25px; color: black;</string>
    </property>
    <property name="text">
     <string>Threshold Value:</string>
@@ -176,8 +176,8 @@
   <widget class="QSlider" name="threshold_value_slider">
    <property name="geometry">
     <rect>
-     <x>880</x>
-     <y>100</y>
+     <x>550</x>
+     <y>60</y>
      <width>160</width>
      <height>22</height>
     </rect>
@@ -189,14 +189,14 @@
   <widget class="QLabel" name="threshold_value_display">
    <property name="geometry">
     <rect>
-     <x>1060</x>
-     <y>80</y>
+     <x>730</x>
+     <y>60</y>
      <width>151</width>
-     <height>41</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">font-size: 30px;</string>
+    <string notr="true">font-size: 25px;</string>
    </property>
    <property name="text">
     <string>127</string>

@@ -33,6 +33,7 @@ MeasureWidget::MeasureWidget(QWidget* parent)
 	threshold_value_display_label_.reset(ui->threshold_value_display);
 
 	file_dialog_ = std::make_unique<QFileDialog>(this, "Select Valve Image");
+	file_dialog_->setStyleSheet("background: white;");
 
 	InitializeUIElements();
 	ConnectEventListeners();
@@ -113,7 +114,7 @@ void MeasureWidget::ConnectEventListeners() {
 	connect(this, &MeasureWidget::onAreaCalculationComplete, this, [this](double valve_area)
 		{
 			QString unit_suffix = GetUnitSuffix(CalibrateWidget::current_unit_selection_);
-			calculated_area_label_->setText("Calculated Valve Area: " + QString::number(valve_area) + unit_suffix);
+			calculated_area_label_->setText("Calculated Valve Area: " + QString::number(valve_area) + " " + unit_suffix);
 		});
 
 	connect(file_dialog_.get(), &QFileDialog::fileSelected, this, [this](const QString& filename) {
