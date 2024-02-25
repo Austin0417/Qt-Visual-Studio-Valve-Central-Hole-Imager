@@ -26,6 +26,9 @@
     <property name="styleSheet">
      <string notr="true">background: gray;</string>
     </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
       <string>Tab 1</string>
@@ -38,7 +41,7 @@
     </widget>
    </widget>
   </widget>
-  <widget class="QMenuBar" name="menubar">
+  <widget class="QMenuBar" name="options_menu">
    <property name="geometry">
     <rect>
      <x>0</x>

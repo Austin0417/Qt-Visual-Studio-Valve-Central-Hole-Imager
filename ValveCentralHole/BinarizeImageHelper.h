@@ -27,4 +27,6 @@ public:
 	static std::pair<unsigned long long, unsigned long long> GetNumberOfOnAndOffPixels(Mat& input);
 	static double GetCalibrationGaugeFactor(unsigned long long num_on_pixels, double gauge_diameter);
 	static double CalculateValveArea(unsigned long long number_on_pixels, double calibration_factor);
+	static void InvertBinaryImage(Mat& mat);
+	static double ApplySalineTransformation(double calibration_factor);
 };

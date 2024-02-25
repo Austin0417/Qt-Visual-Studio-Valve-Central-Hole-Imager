@@ -15,9 +15,17 @@ CurrentUnitSelection CalibrateWidget::current_unit_selection_ = CurrentUnitSelec
  * \param original_mat [in] : Original, input matrix from the image file selected by the user
  * \param is_update [in] : set to true only if the function is used to update preview image as a result of the threshold slider being moved
  */
-static void CreateBinaryImagePreview(CalibrateWidget& calibrate_widget, const Mat& original_mat, bool is_update) {
+static void CreateBinaryImagePreview(CalibrateWidget& calibrate_widget, const Mat& original_mat, int threshold_mode_selection_index, bool is_update) {
 	Mat temp = original_mat.clone();
+	ThresholdMode selected_threshold_mode = static_cast<ThresholdMode>(threshold_mode_selection_index);
+
 	BinarizeImageHelper::BinarizeImage(temp, calibrate_widget.GetThresholdValue(), ThresholdMode::INVERTED);
+
+	if (threshold_mode_selection_index == 0)
+	{
+		BinarizeImageHelper::InvertBinaryImage(temp);
+	}
+
 	calibrate_widget.SetPreviewMat(temp);
 
 	if (is_update)
@@ -100,6 +108,8 @@ void CalibrateWidget::InitializeUIElements()
 	diameter_input_.reset(ui->diameter_input);
 	diameter_unit_selection_.reset(ui->diameter_unit_selection);
 	threshold_input_slider_.reset(ui->threshold_value_slider);
+	threshold_mode_combo_box_.reset(ui->threshold_mode_selection);
+	is_saline_checkbox_.reset(ui->is_saline_selection);
 	threshold_value_label_.reset(ui->threshold_value_display);
 	select_file_button_.reset(ui->select_image_file);
 	original_image_.reset(ui->original_image);
@@ -107,6 +117,9 @@ void CalibrateWidget::InitializeUIElements()
 	preview_btn_.reset(ui->preview_btn);
 	calibrate_btn_.reset(ui->calibrate_btn);
 	calibration_factor_label_.reset(ui->calibration_factor_label);
+	threshold_mode_tooltip_label_.reset(ui->threshold_mode_tooltip_);
+	saline_tooltip_label_.reset(ui->saline_tooltip);
+
 	file_select_ = std::make_unique<QFileDialog>(this, "Select Gauge Image");
 
 	diameter_unit_selection_->addItem("mm");
@@ -117,11 +130,33 @@ void CalibrateWidget::InitializeUIElements()
 	threshold_input_slider_->setSingleStep(1);
 	threshold_input_slider_->setValue(127);
 
+	threshold_mode_combo_box_->addItem("Standard");
+	threshold_mode_combo_box_->addItem("Inverted");
+
 	diameter_input_->setMinimum(0);
 	diameter_input_->setMaximum(1000000);
 	diameter_input_->setDecimals(5);
 
 	file_select_->setStyleSheet("background: white;");
+
+	threshold_mode_tooltip_label_->setPixmap(QPixmap("tooltip_question_mark.png")
+		.scaled(threshold_mode_tooltip_label_->width(), threshold_mode_tooltip_label_->height()));
+	saline_tooltip_label_->setPixmap(QPixmap("tooltip_question_mark.png")
+		.scaled(saline_tooltip_label_->width(), saline_tooltip_label_->height()));
+
+	threshold_mode_tooltip_label_->setToolTip("Choose the thresholding mode. \nIn Standard Thresholding mode, pixels with intensity values over the threshold value will become white, and intensity values below will be black."
+		"\nIn Inverted, the inverse is applied");
+	saline_tooltip_label_->setToolTip("Check the box to indicate that the calculations should take into account the index of refraction for saline."
+		"\nIn particular, it will account for the magnification cause by refraction");
+
+	threshold_mode_tooltip_label_->setToolTipDuration(20000);
+	saline_tooltip_label_->setToolTipDuration(20000);
+}
+
+void CalibrateWidget::DisplayCalibrationFactor()
+{
+	QString unit_display = GetUnitSuffix(current_unit_selection_);
+	calibration_factor_label_->setText("Calibration Factor: " + QString::number(calibration_factor_) + " " + unit_display);
 }
 
 // Add event listeners
@@ -163,7 +198,20 @@ void CalibrateWidget::ConnectEventListeners()
 			// When the slider is moved, we want to update the preview image if it is currently shown
 			if (!current_image_mat_.empty() && !binarized_preview_image_mat_.empty() && isCurrentlyShowingPreview)
 			{
-				std::future<void> thread_handle = std::async(std::launch::async, &CreateBinaryImagePreview, std::ref(*this), std::ref(current_image_mat_), true);
+				std::future<void> thread_handle = std::async(std::launch::async, &CreateBinaryImagePreview, std::ref(*this),
+					std::ref(current_image_mat_), threshold_mode_combo_box_->currentIndex(), true);
+			}
+		});
+
+	connect(threshold_mode_combo_box_.get(), &QComboBox::currentIndexChanged, this, [this](int index)
+		{
+			if (!binarized_preview_image_mat_.empty())
+			{
+				BinarizeImageHelper::InvertBinaryImage(binarized_preview_image_mat_);
+			}
+			if (isCurrentlyShowingPreview)
+			{
+				DisplayPreviewMat();
 			}
 		});
 
@@ -196,7 +244,8 @@ void CalibrateWidget::ConnectEventListeners()
 		original_image_->setPixmap(scaled);
 
 		// Binarize the selected image on a separate thread to have it ready for preview
-		auto thread_handle = std::async(std::launch::async, &CreateBinaryImagePreview, std::ref(*this), std::ref(current_image_mat_), false);
+		auto thread_handle = std::async(std::launch::async, &CreateBinaryImagePreview,
+			std::ref(*this), std::ref(current_image_mat_), threshold_mode_combo_box_->currentIndex(), false);
 		});
 
 	// When the preview button is pressed, we only want to binarize the input image for previewing (don't perform any calibration work yet)
@@ -220,15 +269,35 @@ void CalibrateWidget::ConnectEventListeners()
 		auto thread_handle = std::async(std::launch::async, [this]()
 			{
 				std::pair<unsigned long long, unsigned long long> num_on_off_pixels = BinarizeImageHelper::GetNumberOfOnAndOffPixels(binarized_preview_image_mat_);
-				double calibration_factor = BinarizeImageHelper::GetCalibrationGaugeFactor(num_on_off_pixels.first, gauge_diameter_);
+				double calibration_factor;
+				switch (threshold_mode_combo_box_->currentIndex())
+				{
+					// Standard thresholding mode, we should use the number of off pixels to get the calibration factor
+				case 0:
+				{
+					calibration_factor = BinarizeImageHelper::GetCalibrationGaugeFactor(num_on_off_pixels.second, gauge_diameter_);
+					break;
+				}
+				case 1:
+				{
+					calibration_factor = BinarizeImageHelper::GetCalibrationGaugeFactor(num_on_off_pixels.first, gauge_diameter_);
+					break;
+				}
+				}
+
+				// Apply any necessary saline transformations to the resulting calibration factor
+				if (is_saline_checkbox_->isChecked())
+				{
+					calibration_factor = BinarizeImageHelper::ApplySalineTransformation(calibration_factor);
+				}
+
 				emit this->OnCalibrationComplete(calibration_factor);
 			});
 		});
 
 	connect(this, &CalibrateWidget::OnCalibrationComplete, this, [this](double calibrationFactor) {
 		calibration_factor_ = calibrationFactor;
-		QString unit_display = GetUnitSuffix(current_unit_selection_);
-		calibration_factor_label_->setText("Calibration Factor: " + QString::number(calibration_factor_) + " " + unit_display);
+		DisplayCalibrationFactor();
 		});
 }
 

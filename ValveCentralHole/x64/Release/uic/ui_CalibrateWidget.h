@@ -11,6 +11,7 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QLabel>
@@ -37,6 +38,11 @@ public:
     QComboBox *diameter_unit_selection;
     QSlider *threshold_value_slider;
     QLabel *threshold_value_display;
+    QCheckBox *is_saline_selection;
+    QComboBox *threshold_mode_selection;
+    QLabel *label_3;
+    QLabel *threshold_mode_tooltip_;
+    QLabel *saline_tooltip;
 
     void setupUi(QWidget *CalibrateWidget)
     {
@@ -58,7 +64,7 @@ public:
         label_2->setStyleSheet(QString::fromUtf8("font-size: 25px; color: black;"));
         select_image_file = new QPushButton(CalibrateWidget);
         select_image_file->setObjectName("select_image_file");
-        select_image_file->setGeometry(QRect(590, 110, 151, 31));
+        select_image_file->setGeometry(QRect(470, 110, 151, 31));
         select_image_file->setStyleSheet(QString::fromUtf8("background: white;"));
         original_image = new QLabel(CalibrateWidget);
         original_image->setObjectName("original_image");
@@ -78,11 +84,11 @@ public:
         label_6->setStyleSheet(QString::fromUtf8("font-size: 25px; color: black;"));
         preview_btn = new QPushButton(CalibrateWidget);
         preview_btn->setObjectName("preview_btn");
-        preview_btn->setGeometry(QRect(590, 140, 151, 31));
+        preview_btn->setGeometry(QRect(470, 140, 151, 31));
         preview_btn->setStyleSheet(QString::fromUtf8("background: white;"));
         calibrate_btn = new QPushButton(CalibrateWidget);
         calibrate_btn->setObjectName("calibrate_btn");
-        calibrate_btn->setGeometry(QRect(590, 170, 151, 31));
+        calibrate_btn->setGeometry(QRect(470, 170, 151, 31));
         calibrate_btn->setStyleSheet(QString::fromUtf8("background: white;"));
         calibration_factor_label = new QLabel(CalibrateWidget);
         calibration_factor_label->setObjectName("calibration_factor_label");
@@ -100,6 +106,22 @@ public:
         threshold_value_display->setObjectName("threshold_value_display");
         threshold_value_display->setGeometry(QRect(740, 60, 71, 31));
         threshold_value_display->setStyleSheet(QString::fromUtf8("font-size: 25px;"));
+        is_saline_selection = new QCheckBox(CalibrateWidget);
+        is_saline_selection->setObjectName("is_saline_selection");
+        is_saline_selection->setGeometry(QRect(770, 150, 76, 20));
+        threshold_mode_selection = new QComboBox(CalibrateWidget);
+        threshold_mode_selection->setObjectName("threshold_mode_selection");
+        threshold_mode_selection->setGeometry(QRect(770, 110, 101, 22));
+        threshold_mode_selection->setStyleSheet(QString::fromUtf8("background: white"));
+        label_3 = new QLabel(CalibrateWidget);
+        label_3->setObjectName("label_3");
+        label_3->setGeometry(QRect(670, 110, 91, 16));
+        threshold_mode_tooltip_ = new QLabel(CalibrateWidget);
+        threshold_mode_tooltip_->setObjectName("threshold_mode_tooltip_");
+        threshold_mode_tooltip_->setGeometry(QRect(880, 110, 21, 21));
+        saline_tooltip = new QLabel(CalibrateWidget);
+        saline_tooltip->setObjectName("saline_tooltip");
+        saline_tooltip->setGeometry(QRect(830, 150, 21, 21));
 
         retranslateUi(CalibrateWidget);
 
@@ -120,6 +142,10 @@ public:
         calibrate_btn->setText(QCoreApplication::translate("CalibrateWidget", "Calibrate", nullptr));
         calibration_factor_label->setText(QCoreApplication::translate("CalibrateWidget", "Calibration Factor: ", nullptr));
         threshold_value_display->setText(QCoreApplication::translate("CalibrateWidget", "127", nullptr));
+        is_saline_selection->setText(QCoreApplication::translate("CalibrateWidget", "Saline", nullptr));
+        label_3->setText(QCoreApplication::translate("CalibrateWidget", "Threshold Mode:", nullptr));
+        threshold_mode_tooltip_->setText(QString());
+        saline_tooltip->setText(QString());
     } // retranslateUi
 
 };
