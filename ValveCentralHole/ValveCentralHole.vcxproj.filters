@@ -52,6 +52,9 @@
     <ClCompile Include="MeasureWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ThreadPool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="CalibrateWidget.ui">
@@ -76,12 +79,18 @@
     <ClInclude Include="BinarizeImageHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ThreadPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="window_icon.jpg">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="tooltip_question_mark.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="checkmark_icon.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

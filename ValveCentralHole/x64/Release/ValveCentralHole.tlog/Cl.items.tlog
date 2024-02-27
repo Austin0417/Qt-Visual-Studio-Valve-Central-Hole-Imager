@@ -2,9 +2,10 @@ C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\BinarizeImage
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\CalibrateWidget.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Release\CalibrateWidget.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\MeasureWidget.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Release\MeasureWidget.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\MessageBoxHelper.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Release\MessageBoxHelper.obj
+C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\ThreadPool.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Release\ThreadPool.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\ValveCentralHole.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Release\ValveCentralHole.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\main.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Release\main.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Release\rcc\qrc_ValveCentralHole.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Release\qrc_ValveCentralHole.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Release\moc\moc_ValveCentralHole.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Release\moc_ValveCentralHole.obj
-C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Release\moc\moc_CalibrateWidget.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Release\moc_CalibrateWidget.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Release\moc\moc_MeasureWidget.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Release\moc_MeasureWidget.obj
+C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Release\moc\moc_CalibrateWidget.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Release\moc_CalibrateWidget.obj
