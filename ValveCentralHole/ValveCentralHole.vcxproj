@@ -116,6 +116,7 @@
     <ClCompile Include="CalibrateWidget.cpp" />
     <ClCompile Include="MeasureWidget.cpp" />
     <ClCompile Include="MessageBoxHelper.cpp" />
+    <ClCompile Include="ThreadPool.cpp" />
     <ClCompile Include="ValveCentralHole.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -124,10 +125,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BinarizeImageHelper.h" />
+    <ClInclude Include="ThreadPool.h" />
     <QtMoc Include="MeasureWidget.h" />
     <ClInclude Include="MessageBoxHelper.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="checkmark_icon.png" />
     <Image Include="tooltip_question_mark.png" />
     <Image Include="window_icon.jpg" />
   </ItemGroup>

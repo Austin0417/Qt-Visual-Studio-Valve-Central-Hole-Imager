@@ -43,6 +43,7 @@ public:
     QLabel *label_3;
     QLabel *threshold_mode_tooltip_;
     QLabel *saline_tooltip;
+    QPushButton *clear_lines;
 
     void setupUi(QWidget *CalibrateWidget)
     {
@@ -122,6 +123,9 @@ public:
         saline_tooltip = new QLabel(CalibrateWidget);
         saline_tooltip->setObjectName("saline_tooltip");
         saline_tooltip->setGeometry(QRect(830, 150, 21, 21));
+        clear_lines = new QPushButton(CalibrateWidget);
+        clear_lines->setObjectName("clear_lines");
+        clear_lines->setGeometry(QRect(1060, 20, 151, 24));
 
         retranslateUi(CalibrateWidget);
 
@@ -146,6 +150,7 @@ public:
         label_3->setText(QCoreApplication::translate("CalibrateWidget", "Threshold Mode:", nullptr));
         threshold_mode_tooltip_->setText(QString());
         saline_tooltip->setText(QString());
+        clear_lines->setText(QCoreApplication::translate("CalibrateWidget", "Clear Gauge Helper Lines", nullptr));
     } // retranslateUi
 
 };

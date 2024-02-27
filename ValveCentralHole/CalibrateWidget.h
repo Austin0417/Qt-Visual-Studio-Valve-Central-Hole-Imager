@@ -2,6 +2,7 @@
 
 #include "BinarizeImageHelper.h"
 #include "ui_CalibrateWidget.h"
+#include "ThreadPool.h"
 #include <QObject>
 #include <QComboBox>
 #include <QString>
@@ -10,9 +11,12 @@
 #include <QFileDialog>
 #include <QDoubleSpinBox>
 #include <QVBoxLayout>
-#include <QSpinBox>
+#include <QPainter>
+#include <QPen>
+#include <QBrush>
 #include <QLabel>
 #include <QSlider>
+#include <QMouseEvent>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
@@ -20,6 +24,7 @@
 #include <opencv2/videoio.hpp>
 #include <future>
 #include <memory>
+#include <vector>
 
 
 constexpr int IMAGE_WIDTH = 610;
@@ -47,7 +52,7 @@ class CalibrateWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	CalibrateWidget(QWidget* parent = nullptr);
+	CalibrateWidget(const std::unique_ptr<bool>& gauge_helper_tool_flag, QWidget* parent = nullptr);
 	static double GetGaugeDiameter();
 	int GetThresholdValue() const;
 	static double GetCalibrationFactor();
@@ -55,20 +60,33 @@ public:
 
 	static CurrentUnitSelection current_unit_selection_;
 
+
 signals:
 	void UpdatePreviewMat();
 	void OnCalibrationComplete(double calibration_factor);
 
+protected:
+	virtual void paintEvent(QPaintEvent* event) override;
+	virtual void mouseDoubleClickEvent(QMouseEvent* event) override;
+
 private:
 	Ui::CalibrateWidget* ui;
+	const std::unique_ptr<bool>& gauge_helper_flag_;
 	Mat current_image_mat_;
 	Mat binarized_preview_image_mat_;
+	ThreadPool tp;
 
 	static double gauge_diameter_;
 	int threshold_value_ = 127;
 	static double calibration_factor_;
 	QString selected_image_filename_;
 	bool isCurrentlyShowingPreview = false;
+
+	std::vector<std::pair<QPointF, QPointF>> line_points_;
+	std::pair<QPointF, QPointF> current_line_point_pair_;
+	bool is_on_line_start_ = true;
+	QPointF start_line_;
+	QPointF end_line_;
 
 	std::unique_ptr<QDoubleSpinBox> diameter_input_;
 	std::unique_ptr<QComboBox> diameter_unit_selection_;
@@ -86,6 +104,7 @@ private:
 	std::unique_ptr<QLabel> calibration_factor_label_;
 	std::unique_ptr<QLabel> threshold_mode_tooltip_label_;
 	std::unique_ptr<QLabel> saline_tooltip_label_;
+	std::unique_ptr<QPushButton> clear_lines_btn_;
 
 	void InitializeUIElements();
 	void ConnectEventListeners();

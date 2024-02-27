@@ -5,7 +5,7 @@ void ValveCentralHole::InitializeUIElements() {
 	// Initialize Tab Widget and add the necessary tabs
 	tab_widget.reset(ui.tab_widget);
 	menu_bar_.reset(ui.options_menu);
-	calibrate_tab_ = std::make_unique<CalibrateWidget>(this);
+	calibrate_tab_ = std::make_unique<CalibrateWidget>(is_gauge_helper_tool_active_, this);
 	measure_tab_ = std::make_unique<MeasureWidget>(this);
 
 	options_menu_.reset(menu_bar_->addMenu("Options"));
@@ -20,6 +20,8 @@ void ValveCentralHole::InitializeUIElements() {
 	// Setting the window icon
 	setWindowTitle("Valve Central Hole Calculator");
 	setWindowIcon(QIcon("window_icon.jpg"));
+
+	is_gauge_helper_tool_active_ = std::make_unique<bool>(false);
 }
 
 void ValveCentralHole::ConnectEventListeners() {
@@ -35,6 +37,15 @@ void ValveCentralHole::ConnectEventListeners() {
 	connect(options_menu_.get(), &QMenu::triggered, this, [this](QAction* triggered)
 		{
 			qDebug() << "Activated action: " << triggered->text();
+			*is_gauge_helper_tool_active_ = !(*is_gauge_helper_tool_active_);
+			if (*is_gauge_helper_tool_active_)
+			{
+				triggered->setIcon(QIcon("checkmark_icon.png"));
+			}
+			else
+			{
+				triggered->setIcon(QIcon(QPixmap()));
+			}
 		});
 }
 

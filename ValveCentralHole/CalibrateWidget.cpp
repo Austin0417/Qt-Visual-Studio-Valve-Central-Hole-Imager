@@ -15,11 +15,11 @@ CurrentUnitSelection CalibrateWidget::current_unit_selection_ = CurrentUnitSelec
  * \param original_mat [in] : Original, input matrix from the image file selected by the user
  * \param is_update [in] : set to true only if the function is used to update preview image as a result of the threshold slider being moved
  */
-static void CreateBinaryImagePreview(CalibrateWidget& calibrate_widget, const Mat& original_mat, int threshold_mode_selection_index, bool is_update) {
+static void CreateBinaryImagePreview(CalibrateWidget& calibrate_widget, const Mat& original_mat, int threshold_value, int threshold_mode_selection_index, bool is_update) {
 	Mat temp = original_mat.clone();
 	ThresholdMode selected_threshold_mode = static_cast<ThresholdMode>(threshold_mode_selection_index);
 
-	BinarizeImageHelper::BinarizeImage(temp, calibrate_widget.GetThresholdValue(), ThresholdMode::INVERTED);
+	BinarizeImageHelper::BinarizeImage(temp, threshold_value, ThresholdMode::INVERTED);
 
 	if (threshold_mode_selection_index == 0)
 	{
@@ -54,12 +54,59 @@ QString GetUnitSuffix(CurrentUnitSelection unit_selection_)
 }
 
 
-CalibrateWidget::CalibrateWidget(QWidget* parent) : QWidget(parent), ui(new Ui::CalibrateWidget) {
+CalibrateWidget::CalibrateWidget(const std::unique_ptr<bool>& gauge_helper_flag, QWidget* parent) : gauge_helper_flag_(gauge_helper_flag), QWidget(parent), ui(new Ui::CalibrateWidget) {
 
 	ui->setupUi(this);
+
+	// Initialize thread pool with 1 thread, which will be used for updating the binary preview image
+	tp.setNumThreads(1);
+
 	InitializeUIElements();
 	ConnectEventListeners();
 }
+
+void CalibrateWidget::paintEvent(QPaintEvent* event)
+{
+	QPainter painter(this);
+	QPen pen(QBrush(QColor(255, 0, 0)), 10);
+	painter.setPen(pen);
+
+	for (auto& line_pair : line_points_)
+	{
+		// If the pair of points differ in their y coordinates, make the second point match the first's y coordinate
+		// This is to make it so only straight lines are drawn
+		if (line_pair.first.y() != line_pair.second.y())
+		{
+			QPointF& second_point = line_pair.second;
+			second_point.setY(line_pair.first.y());
+		}
+		painter.drawLine(line_pair.first, line_pair.second);
+	}
+}
+
+
+void CalibrateWidget::mouseDoubleClickEvent(QMouseEvent* event)
+{
+	if (*gauge_helper_flag_)
+	{
+		qDebug() << "Drawing line at (" << event->position().x() << ", " << event->position().y() << ")";
+		if (is_on_line_start_)
+		{
+			start_line_ = event->position();
+		}
+		else
+		{
+			end_line_ = event->position();
+			current_line_point_pair_ = std::make_pair(start_line_, end_line_);
+			line_points_.push_back(current_line_point_pair_);
+			update();
+		}
+		is_on_line_start_ = !is_on_line_start_;
+	}
+	QWidget::mouseDoubleClickEvent(event);
+
+}
+
 
 void CalibrateWidget::SetPreviewMat(Mat mat)
 {
@@ -119,6 +166,7 @@ void CalibrateWidget::InitializeUIElements()
 	calibration_factor_label_.reset(ui->calibration_factor_label);
 	threshold_mode_tooltip_label_.reset(ui->threshold_mode_tooltip_);
 	saline_tooltip_label_.reset(ui->saline_tooltip);
+	clear_lines_btn_.reset(ui->clear_lines);
 
 	file_select_ = std::make_unique<QFileDialog>(this, "Select Gauge Image");
 
@@ -198,8 +246,12 @@ void CalibrateWidget::ConnectEventListeners()
 			// When the slider is moved, we want to update the preview image if it is currently shown
 			if (!current_image_mat_.empty() && !binarized_preview_image_mat_.empty() && isCurrentlyShowingPreview)
 			{
-				std::future<void> thread_handle = std::async(std::launch::async, &CreateBinaryImagePreview, std::ref(*this),
-					std::ref(current_image_mat_), threshold_mode_combo_box_->currentIndex(), true);
+				tp.enqueue([this, value]()
+					{
+						CreateBinaryImagePreview(*this, current_image_mat_, value, threshold_mode_combo_box_->currentIndex(), true);
+					});
+				//std::future<void> thread_handle = std::async(std::launch::async, &CreateBinaryImagePreview, std::ref(*this),
+					//std::ref(current_image_mat_), threshold_mode_combo_box_->currentIndex(), true);
 			}
 		});
 
@@ -245,7 +297,7 @@ void CalibrateWidget::ConnectEventListeners()
 
 		// Binarize the selected image on a separate thread to have it ready for preview
 		auto thread_handle = std::async(std::launch::async, &CreateBinaryImagePreview,
-			std::ref(*this), std::ref(current_image_mat_), threshold_mode_combo_box_->currentIndex(), false);
+			std::ref(*this), std::ref(current_image_mat_), threshold_value_, threshold_mode_combo_box_->currentIndex(), false);
 		});
 
 	// When the preview button is pressed, we only want to binarize the input image for previewing (don't perform any calibration work yet)
@@ -298,6 +350,11 @@ void CalibrateWidget::ConnectEventListeners()
 	connect(this, &CalibrateWidget::OnCalibrationComplete, this, [this](double calibrationFactor) {
 		calibration_factor_ = calibrationFactor;
 		DisplayCalibrationFactor();
+		});
+
+	connect(clear_lines_btn_.get(), &QPushButton::clicked, this, [this]()
+		{
+
 		});
 }
 

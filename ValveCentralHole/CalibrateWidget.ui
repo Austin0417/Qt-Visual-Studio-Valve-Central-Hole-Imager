@@ -296,6 +296,19 @@
     <string/>
    </property>
   </widget>
+  <widget class="QPushButton" name="clear_lines">
+   <property name="geometry">
+    <rect>
+     <x>1060</x>
+     <y>20</y>
+     <width>151</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Clear Gauge Helper Lines</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>
