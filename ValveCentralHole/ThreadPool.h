@@ -21,6 +21,7 @@ public:
 	ThreadPool(int num_threads);
 	void setNumThreads(int num_threads);
 	void enqueue(const std::function<void()>& task);
+	const std::queue<std::function<void()>>& getTaskQueue() const;
 	~ThreadPool();
 };
 

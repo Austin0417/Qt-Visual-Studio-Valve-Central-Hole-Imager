@@ -1,5 +1,4 @@
-﻿  moc CalibrateWidget.h
-  CalibrateWidget.cpp
+﻿  CalibrateWidget.cpp
   MeasureWidget.cpp
   ThreadPool.cpp
   ValveCentralHole.cpp
