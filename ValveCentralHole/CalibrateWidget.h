@@ -24,6 +24,7 @@
 #include <opencv2/videoio.hpp>
 #include <future>
 #include <memory>
+#include <mutex>
 #include <vector>
 
 
@@ -57,6 +58,7 @@ public:
 	int GetThresholdValue() const;
 	static double GetCalibrationFactor();
 	void SetPreviewMat(Mat preview_mat);
+	const ThreadPool& GetWidgetThreadPool() const;
 
 	static CurrentUnitSelection current_unit_selection_;
 
@@ -74,7 +76,9 @@ private:
 	const std::unique_ptr<bool>& gauge_helper_flag_;
 	Mat current_image_mat_;
 	Mat binarized_preview_image_mat_;
-	ThreadPool tp;
+
+	std::mutex mutex_;
+	ThreadPool tp_;
 
 	static double gauge_diameter_;
 	int threshold_value_ = 127;

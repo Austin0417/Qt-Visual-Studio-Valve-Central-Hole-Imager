@@ -54,6 +54,11 @@ void ThreadPool::enqueue(const std::function<void()>& task)
 	cv_.notify_one();
 }
 
+const std::queue<std::function<void()>>& ThreadPool::getTaskQueue() const
+{
+	return tasks_;
+}
+
 ThreadPool::~ThreadPool()
 {
 	{

@@ -15,8 +15,9 @@ CurrentUnitSelection CalibrateWidget::current_unit_selection_ = CurrentUnitSelec
  * \param original_mat [in] : Original, input matrix from the image file selected by the user
  * \param is_update [in] : set to true only if the function is used to update preview image as a result of the threshold slider being moved
  */
-static void CreateBinaryImagePreview(CalibrateWidget& calibrate_widget, const Mat& original_mat, int threshold_value, int threshold_mode_selection_index, bool is_update) {
+static void CreateBinaryImagePreview(CalibrateWidget& calibrate_widget, const Mat& original_mat, int threshold_value, int threshold_mode_selection_index, bool is_update, std::mutex& mutex) {
 	Mat temp = original_mat.clone();
+
 	ThresholdMode selected_threshold_mode = static_cast<ThresholdMode>(threshold_mode_selection_index);
 
 	BinarizeImageHelper::BinarizeImage(temp, threshold_value, ThresholdMode::INVERTED);
@@ -26,11 +27,37 @@ static void CreateBinaryImagePreview(CalibrateWidget& calibrate_widget, const Ma
 		BinarizeImageHelper::InvertBinaryImage(temp);
 	}
 
-	calibrate_widget.SetPreviewMat(temp);
-
-	if (is_update)
+	// Acquire the mutex lock to avoid race condition where two threads set the binary preview mat at the same time
 	{
-		emit calibrate_widget.UpdatePreviewMat();
+		std::unique_lock<std::mutex> lock(mutex);
+		calibrate_widget.SetPreviewMat(temp);
+	}
+
+	// Check if the image mat is extremely large (5000+ pixels in both directions)
+	// If it is, we should only update when the sliders stops moving, or it'll lag too much
+	if (temp.rows >= 5000 && temp.cols >= 5000)
+	{
+		// If the thread pool's queue is empty, this means that this working thread performed the last preview mat update so it should be updated in the GUI
+		if (calibrate_widget.GetWidgetThreadPool().getTaskQueue().empty())
+		{
+			QMetaObject::invokeMethod(&calibrate_widget, [&calibrate_widget, temp, is_update]() mutable
+				{
+					if (is_update)
+					{
+						emit calibrate_widget.UpdatePreviewMat();
+					}
+				});
+		}
+	}
+	else
+	{
+		QMetaObject::invokeMethod(&calibrate_widget, [&calibrate_widget, temp, is_update]() mutable
+			{
+				if (is_update)
+				{
+					emit calibrate_widget.UpdatePreviewMat();
+				}
+			});
 	}
 }
 
@@ -58,8 +85,8 @@ CalibrateWidget::CalibrateWidget(const std::unique_ptr<bool>& gauge_helper_flag,
 
 	ui->setupUi(this);
 
-	// Initialize thread pool with 1 thread, which will be used for updating the binary preview image
-	tp.setNumThreads(1);
+	// Initialize thread pool with 3 threads, which will be used for updating the binary preview image
+	tp_.setNumThreads(3);
 
 	InitializeUIElements();
 	ConnectEventListeners();
@@ -112,6 +139,12 @@ void CalibrateWidget::SetPreviewMat(Mat mat)
 {
 	binarized_preview_image_mat_ = mat;
 }
+
+const ThreadPool& CalibrateWidget::GetWidgetThreadPool() const
+{
+	return tp_;
+}
+
 
 double CalibrateWidget::GetGaugeDiameter() {
 	return gauge_diameter_;
@@ -246,12 +279,10 @@ void CalibrateWidget::ConnectEventListeners()
 			// When the slider is moved, we want to update the preview image if it is currently shown
 			if (!current_image_mat_.empty() && !binarized_preview_image_mat_.empty() && isCurrentlyShowingPreview)
 			{
-				tp.enqueue([this, value]()
+				tp_.enqueue([this, value]()
 					{
-						CreateBinaryImagePreview(*this, current_image_mat_, value, threshold_mode_combo_box_->currentIndex(), true);
+						CreateBinaryImagePreview(*this, current_image_mat_, value, threshold_mode_combo_box_->currentIndex(), true, mutex_);
 					});
-				//std::future<void> thread_handle = std::async(std::launch::async, &CreateBinaryImagePreview, std::ref(*this),
-					//std::ref(current_image_mat_), threshold_mode_combo_box_->currentIndex(), true);
 			}
 		});
 
@@ -297,7 +328,7 @@ void CalibrateWidget::ConnectEventListeners()
 
 		// Binarize the selected image on a separate thread to have it ready for preview
 		auto thread_handle = std::async(std::launch::async, &CreateBinaryImagePreview,
-			std::ref(*this), std::ref(current_image_mat_), threshold_value_, threshold_mode_combo_box_->currentIndex(), false);
+			std::ref(*this), std::ref(current_image_mat_), threshold_value_, threshold_mode_combo_box_->currentIndex(), false, std::ref(mutex_));
 		});
 
 	// When the preview button is pressed, we only want to binarize the input image for previewing (don't perform any calibration work yet)
