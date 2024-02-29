@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CalibrationGaugeParametersDAO.h"
 #include "BinarizeImageHelper.h"
 #include "ui_CalibrateWidget.h"
 #include "ThreadPool.h"
@@ -40,14 +41,11 @@ namespace Ui {
 
 QT_END_NAMESPACE
 
-enum class CurrentUnitSelection
-{
-	MILLIMETERS,
-	INCHES
-};
 
 
-QString GetUnitSuffix(CurrentUnitSelection current_unit_selection);
+
+
+QString GetUnitSuffix(UnitSelection current_unit_selection);
 
 class CalibrateWidget : public QWidget
 {
@@ -59,8 +57,10 @@ public:
 	static double GetCalibrationFactor();
 	void SetPreviewMat(Mat preview_mat);
 	const ThreadPool& GetWidgetThreadPool() const;
+	void ApplyLastSavedParameters();
 
-	static CurrentUnitSelection current_unit_selection_;
+
+	static UnitSelection current_unit_selection_;
 
 
 signals:
@@ -80,6 +80,7 @@ private:
 	std::mutex mutex_;
 	ThreadPool tp_;
 
+	CalibrationGaugeParameters gauge_parameters_;
 	static double gauge_diameter_;
 	int threshold_value_ = 127;
 	static double calibration_factor_;
@@ -111,8 +112,11 @@ private:
 	std::unique_ptr<QPushButton> clear_lines_btn_;
 
 	void InitializeUIElements();
+	void CheckForLastCalibrationParameters();
 	void ConnectEventListeners();
+	void DisplaySelectedImageFile(const QString& filename, bool is_update = false);
 	void DisplayPreviewMat();
 	void DisplayCalibrationFactor();
+	void SaveCurrentParametersToDatabase();
 };
 

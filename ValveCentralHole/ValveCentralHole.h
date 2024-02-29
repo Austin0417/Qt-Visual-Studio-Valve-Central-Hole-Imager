@@ -9,6 +9,13 @@
 #include "measurewidget.h"
 #include "ui_ValveCentralHole.h"
 
+
+enum OptionsMenuSelection
+{
+	GAUGE_HELPER_TOOL,
+	APPLY_LAST_SAVED_PARAMETERS
+};
+
 class ValveCentralHole : public QMainWindow
 {
 	Q_OBJECT

@@ -1,5 +1,6 @@
 #pragma once
 #include "ThreadPool.h"
+#include "CalibrationGaugeParameters.h"
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
@@ -17,10 +18,7 @@ constexpr double PI = 3.14159;
 
 using namespace cv;
 
-enum class ThresholdMode {
-	STANDARD,
-	INVERTED
-};
+
 
 class BinarizeImageHelper
 {

@@ -1,2 +1,9 @@
-﻿  CalibrateWidget.cpp
+﻿  moc CalibrateWidget.h
+  CalibrateWidget.cpp
+  MeasureWidget.cpp
+  ValveCentralHole.cpp
+  main.cpp
+  moc_CalibrateWidget.cpp
+  moc_MeasureWidget.cpp
+  moc_ValveCentralHole.cpp
   ValveCentralHole.vcxproj -> C:\Users\Austin Luu\source\repos\ValveCentralHole\x64\Debug\ValveCentralHole.exe
