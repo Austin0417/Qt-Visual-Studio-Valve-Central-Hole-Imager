@@ -1,12 +1,2 @@
-﻿  BinarizeImageHelper.cpp
-  CalibrateWidget.cpp
-  MeasureWidget.cpp
-  ValveCentralHole.cpp
-  main.cpp
-  moc_CalibrateWidget.cpp
-  moc_MeasureWidget.cpp
-  moc_ValveCentralHole.cpp
-  qrc_ValveCentralHole.cpp
-  LINK : C:\Users\Austin Luu\source\repos\ValveCentralHole\x64\Debug\ValveCentralHole.exe not found or not built by the last incremental link; performing full link
-BinarizeImageHelper.obj : error LNK2019: unresolved external symbol "void __cdecl cv::morphologyEx(class cv::debug_build_guard::_InputArray const &,class cv::debug_build_guard::_OutputArray const &,int,class cv::debug_build_guard::_InputArray const &,class cv::Point_<int>,int,int,class cv::Scalar_<double> const &)" (?morphologyEx@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_OutputArray@31@H0V?$Point_@H@1@HHAEBV?$Scalar_@N@1@@Z) referenced in function "public: static void __cdecl BinarizeImageHelper::BinarizeImage(class cv::Mat &,int,enum ThresholdMode)" (?BinarizeImage@BinarizeImageHelper@@SAXAEAVMat@cv@@HW4ThresholdMode@@@Z)
-C:\Users\Austin Luu\source\repos\ValveCentralHole\x64\Debug\ValveCentralHole.exe : fatal error LNK1120: 1 unresolved externals
+﻿  CalibrateWidget.cpp
+  ValveCentralHole.vcxproj -> C:\Users\Austin Luu\source\repos\ValveCentralHole\x64\Debug\ValveCentralHole.exe
