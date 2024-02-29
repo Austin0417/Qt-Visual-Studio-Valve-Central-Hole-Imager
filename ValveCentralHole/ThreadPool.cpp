@@ -44,6 +44,12 @@ void ThreadPool::setNumThreads(int num_threads)
 	}
 }
 
+int ThreadPool::getNumThreads() const
+{
+	return num_threads_;
+}
+
+
 
 void ThreadPool::enqueue(const std::function<void()>& task)
 {

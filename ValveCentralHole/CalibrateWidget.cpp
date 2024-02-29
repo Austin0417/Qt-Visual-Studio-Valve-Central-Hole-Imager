@@ -201,6 +201,8 @@ void CalibrateWidget::InitializeUIElements()
 	saline_tooltip_label_.reset(ui->saline_tooltip);
 	clear_lines_btn_.reset(ui->clear_lines);
 
+	clear_lines_btn_->setVisible(false);
+
 	file_select_ = std::make_unique<QFileDialog>(this, "Select Gauge Image");
 
 	diameter_unit_selection_->addItem("mm");
@@ -338,6 +340,8 @@ void CalibrateWidget::ConnectEventListeners()
 		});
 
 	connect(calibrate_btn_.get(), &QPushButton::clicked, this, [this]() {
+
+
 		if (current_image_mat_.empty() || binarized_preview_image_mat_.empty())
 		{
 			MessageBoxHelper::ShowErrorDialog("Select an input image first");
@@ -349,33 +353,31 @@ void CalibrateWidget::ConnectEventListeners()
 			return;
 		}
 
-		auto thread_handle = std::async(std::launch::async, [this]()
-			{
-				std::pair<unsigned long long, unsigned long long> num_on_off_pixels = BinarizeImageHelper::GetNumberOfOnAndOffPixels(binarized_preview_image_mat_);
-				double calibration_factor;
-				switch (threshold_mode_combo_box_->currentIndex())
-				{
-					// Standard thresholding mode, we should use the number of off pixels to get the calibration factor
-				case 0:
-				{
-					calibration_factor = BinarizeImageHelper::GetCalibrationGaugeFactor(num_on_off_pixels.second, gauge_diameter_);
-					break;
-				}
-				case 1:
-				{
-					calibration_factor = BinarizeImageHelper::GetCalibrationGaugeFactor(num_on_off_pixels.first, gauge_diameter_);
-					break;
-				}
-				}
+		std::pair<unsigned long long, unsigned long long> num_on_off_pixels = BinarizeImageHelper::GetNumberOfOnAndOffPixels(binarized_preview_image_mat_, tp_);
+		double calibration_factor;
+		switch (threshold_mode_combo_box_->currentIndex())
+		{
+			// Standard thresholding mode, we should use the number of off pixels to get the calibration factor
+		case 0:
+		{
+			calibration_factor = BinarizeImageHelper::GetCalibrationGaugeFactor(num_on_off_pixels.second, gauge_diameter_);
+			break;
+		}
+		case 1:
+		{
+			calibration_factor = BinarizeImageHelper::GetCalibrationGaugeFactor(num_on_off_pixels.first, gauge_diameter_);
+			break;
+		}
+		}
 
-				// Apply any necessary saline transformations to the resulting calibration factor
-				if (is_saline_checkbox_->isChecked())
-				{
-					calibration_factor = BinarizeImageHelper::ApplySalineTransformation(calibration_factor);
-				}
+		// Apply any necessary saline transformations to the resulting calibration factor
+		if (is_saline_checkbox_->isChecked())
+		{
+			calibration_factor = BinarizeImageHelper::ApplySalineTransformation(calibration_factor);
+		}
 
-				emit this->OnCalibrationComplete(calibration_factor);
-			});
+		emit this->OnCalibrationComplete(calibration_factor);
+
 		});
 
 	connect(this, &CalibrateWidget::OnCalibrationComplete, this, [this](double calibrationFactor) {

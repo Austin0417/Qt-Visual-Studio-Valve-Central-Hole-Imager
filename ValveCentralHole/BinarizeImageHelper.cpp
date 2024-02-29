@@ -1,5 +1,40 @@
 #include "BinarizeImageHelper.h"
 
+static void ThreadWorkCountOnOffPixels(Mat& input, int start_row, int end_row, std::atomic<int>& num_on_pixels,
+	std::atomic<int>& num_off_pixels, std::atomic<int>& num_threads_finished, std::condition_variable& cv)
+{
+	int local_num_on_pixels = 0;
+	int local_num_off_pixels = 0;
+
+	for (int i = start_row; i < end_row; i++)
+	{
+		unsigned char* current_row = input.ptr(i);
+		for (int j = 0; j < input.cols * input.channels(); j++)
+		{
+			switch (current_row[j])
+			{
+			case 0:
+			{
+				local_num_off_pixels++;
+				break;
+			}
+			case 255:
+			{
+				local_num_on_pixels++;
+				break;
+			}
+			}
+		}
+	}
+
+	num_on_pixels += local_num_on_pixels;
+	num_off_pixels += local_num_off_pixels;
+	num_threads_finished++;
+	cv.notify_one();
+}
+
+
+std::mutex BinarizeImageHelper::helper_mutex_;
 
 BinarizeImageHelper::BinarizeImageHelper() {}
 
@@ -67,8 +102,63 @@ std::pair<unsigned long long, unsigned long long> BinarizeImageHelper::GetNumber
 			}
 		}
 	}
-	result = std::make_pair(on_pixels, off_pixels);
+	return std::make_pair(on_pixels, off_pixels);
 	return result;
+}
+
+
+std::pair<unsigned long long, unsigned long long> BinarizeImageHelper::GetNumberOfOnAndOffPixels(Mat& input, ThreadPool& thread_pool)
+{
+	int thread_interval_remainder = input.rows % thread_pool.getNumThreads();
+	int thread_interval_length = input.rows / thread_pool.getNumThreads();
+	int num_intervals = input.rows / thread_interval_length;
+
+	std::atomic<int> num_on_pixels = 0;
+	std::atomic<int> num_off_pixels = 0;
+
+	std::atomic<int> num_threads_finished = 0;
+	std::condition_variable cv;
+
+	if (thread_interval_remainder == 0)
+	{
+		for (int i = 0; i < num_intervals; i++)
+		{
+			thread_pool.enqueue([&input, i, thread_interval_length, &num_on_pixels, &num_off_pixels, &num_threads_finished, &cv]()
+				{
+					ThreadWorkCountOnOffPixels(input, i * thread_interval_length, (i + 1) * thread_interval_length,
+					num_on_pixels, num_off_pixels, num_threads_finished, cv);
+				});
+		}
+	}
+	else
+	{
+		for (int i = 0; i < num_intervals; i++)
+		{
+			if (i == num_intervals - 1)
+			{
+				thread_pool.enqueue([&]()
+					{
+						ThreadWorkCountOnOffPixels(input, i * thread_interval_length,
+						(i + 1) * thread_interval_length + thread_interval_remainder, num_on_pixels, num_off_pixels, num_threads_finished, cv);
+					});
+				break;
+			}
+			thread_pool.enqueue([&]()
+				{
+					ThreadWorkCountOnOffPixels(input, i * thread_interval_length, (i + 1) * thread_interval_length,
+					num_on_pixels, num_off_pixels, num_threads_finished, cv);
+				});
+		}
+	}
+
+	{
+		std::unique_lock<std::mutex> lock(helper_mutex_);
+		cv.wait(lock, [&]()
+			{
+				return num_threads_finished.load() >= thread_pool.getNumThreads();
+			});
+	}
+	return std::make_pair(num_on_pixels.load(), num_off_pixels.load());
 }
 
 
