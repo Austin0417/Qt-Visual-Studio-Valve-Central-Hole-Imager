@@ -5,7 +5,7 @@
 double CalibrateWidget::gauge_diameter_ = 0;
 double CalibrateWidget::calibration_factor_ = 0;
 
-CurrentUnitSelection CalibrateWidget::current_unit_selection_ = CurrentUnitSelection::MILLIMETERS;
+UnitSelection CalibrateWidget::current_unit_selection_ = UnitSelection::MILLIMETERS;
 
 
 // Performs image binarization on a copy of the input image, and sets the preview Mat to this copy
@@ -61,17 +61,17 @@ static void CreateBinaryImagePreview(CalibrateWidget& calibrate_widget, const Ma
 	}
 }
 
-QString GetUnitSuffix(CurrentUnitSelection unit_selection_)
+QString GetUnitSuffix(UnitSelection unit_selection_)
 {
 	QString result;
 	switch (unit_selection_)
 	{
-	case  CurrentUnitSelection::INCHES:
+	case  UnitSelection::INCHES:
 	{
 		result = "in^2";
 		break;
 	}
-	case CurrentUnitSelection::MILLIMETERS:
+	case UnitSelection::MILLIMETERS:
 	{
 		result = "mm^2";
 		break;
@@ -87,7 +87,7 @@ CalibrateWidget::CalibrateWidget(const std::unique_ptr<bool>& gauge_helper_flag,
 
 	// Initialize thread pool with 3 threads, which will be used for updating the binary preview image
 	tp_.setNumThreads(3);
-
+	CheckForLastCalibrationParameters();
 	InitializeUIElements();
 	ConnectEventListeners();
 }
@@ -145,6 +145,21 @@ const ThreadPool& CalibrateWidget::GetWidgetThreadPool() const
 	return tp_;
 }
 
+void CalibrateWidget::ApplyLastSavedParameters()
+{
+	if (!gauge_parameters_.IsValid())
+	{
+		return;
+	}
+
+	diameter_input_->setValue(gauge_parameters_.GetGaugeDiameter());
+	threshold_input_slider_->setValue(gauge_parameters_.GetThresholdValue());
+	diameter_unit_selection_->setCurrentIndex(static_cast<int>(gauge_parameters_.GetUnitSelection()));
+	threshold_mode_combo_box_->setCurrentIndex(static_cast<int>(gauge_parameters_.GetThresholdMode()));
+	threshold_value_label_->setText(QString::number(gauge_parameters_.GetThresholdValue()));
+	DisplaySelectedImageFile(gauge_parameters_.GetImageFileName(), true);
+}
+
 
 double CalibrateWidget::GetGaugeDiameter() {
 	return gauge_diameter_;
@@ -157,6 +172,28 @@ int CalibrateWidget::GetThresholdValue() const {
 double CalibrateWidget::GetCalibrationFactor() {
 	return calibration_factor_;
 }
+
+void CalibrateWidget::DisplaySelectedImageFile(const QString& filename, bool is_update)
+{
+	current_image_mat_ = imread(selected_image_filename_.toStdString(), IMREAD_GRAYSCALE);
+	if (current_image_mat_.empty())
+	{
+		MessageBoxHelper::ShowErrorDialog("An error occurred while attempting to display the image file");
+		return;
+	}
+
+	QPixmap image(filename);
+	QPixmap scaled = image.scaled(QSize(IMAGE_WIDTH, IMAGE_HEIGHT));
+	original_image_->setPixmap(scaled);
+
+	gauge_parameters_.SetImageFileName(selected_image_filename_);
+	SaveCurrentParametersToDatabase();
+
+	// Binarize the selected image on a separate thread to have it ready for preview
+	auto thread_handle = std::async(std::launch::async, &CreateBinaryImagePreview,
+		std::ref(*this), std::ref(current_image_mat_), threshold_value_, threshold_mode_combo_box_->currentIndex(), is_update, std::ref(mutex_));
+}
+
 
 void CalibrateWidget::DisplayPreviewMat()
 {
@@ -236,6 +273,32 @@ void CalibrateWidget::InitializeUIElements()
 	saline_tooltip_label_->setToolTipDuration(20000);
 }
 
+void CalibrateWidget::CheckForLastCalibrationParameters()
+{
+	CalibrationGaugeParametersDAO dao;
+	if (dao.IsTableEmpty())
+	{
+		qDebug() << "Table is empty, creating first row...";
+		dao.AddGaugeParameters(gauge_parameters_, [this](bool query_status)
+			{
+				if (!query_status)
+				{
+					qDebug() << "Failed to add the first row to the calibration_gauge_parameters table";
+				}
+			});
+	}
+	else
+	{
+		gauge_parameters_ = dao.RetrieveGaugeParameters();
+		qDebug() << "Retrieved parameters " << gauge_parameters_.toString();
+
+		gauge_diameter_ = gauge_parameters_.GetGaugeDiameter();
+		threshold_value_ = gauge_parameters_.GetThresholdValue();
+		selected_image_filename_ = gauge_parameters_.GetImageFileName();
+	}
+}
+
+
 void CalibrateWidget::DisplayCalibrationFactor()
 {
 	QString unit_display = GetUnitSuffix(current_unit_selection_);
@@ -250,26 +313,36 @@ void CalibrateWidget::ConnectEventListeners()
 		gauge_diameter_ = new_value;
 		});
 
+	connect(diameter_input_.get(), &QAbstractSpinBox::editingFinished, this, [this]()
+		{
+			gauge_parameters_.SetGaugeDiameter(diameter_input_->value());
+			SaveCurrentParametersToDatabase();
+		});
+
 	connect(diameter_unit_selection_.get(), &QComboBox::currentIndexChanged, this, [this](int index)
 		{
-			switch (index)
+			switch (static_cast<UnitSelection>(index))
 			{
 				// Millimeters selection, convert from inches to millimeters
-			case 0:
+			case UnitSelection::MILLIMETERS:
 			{
 				gauge_diameter_ *= 25.4;
-				current_unit_selection_ = CurrentUnitSelection::MILLIMETERS;
+				current_unit_selection_ = UnitSelection::MILLIMETERS;
 				break;
 			}
 			// Inches selection, convert from millimeters to inches
-			case 1:
+			case UnitSelection::INCHES:
 			{
 				gauge_diameter_ /= 25.4;
-				current_unit_selection_ = CurrentUnitSelection::INCHES;
+				current_unit_selection_ = UnitSelection::INCHES;
 				break;
 			}
 			}
 			diameter_input_->setValue(gauge_diameter_);
+			gauge_parameters_.SetUnitSelection(current_unit_selection_);
+			gauge_parameters_.SetGaugeDiameter(gauge_diameter_);
+
+			SaveCurrentParametersToDatabase();
 		});
 
 	connect(threshold_input_slider_.get(), &QAbstractSlider::sliderMoved, this, [this](int value)
@@ -288,6 +361,12 @@ void CalibrateWidget::ConnectEventListeners()
 			}
 		});
 
+	connect(threshold_input_slider_.get(), &QSlider::sliderReleased, this, [this]()
+		{
+			gauge_parameters_.SetThresholdValue(threshold_value_);
+			SaveCurrentParametersToDatabase();
+		});
+
 	connect(threshold_mode_combo_box_.get(), &QComboBox::currentIndexChanged, this, [this](int index)
 		{
 			if (!binarized_preview_image_mat_.empty())
@@ -298,6 +377,9 @@ void CalibrateWidget::ConnectEventListeners()
 			{
 				DisplayPreviewMat();
 			}
+
+			gauge_parameters_.SetThresholdMode(static_cast<ThresholdMode>(index));
+			SaveCurrentParametersToDatabase();
 		});
 
 	connect(this, &CalibrateWidget::UpdatePreviewMat, this, [this]()
@@ -317,20 +399,7 @@ void CalibrateWidget::ConnectEventListeners()
 			return;
 		}
 		selected_image_filename_ = file;
-		current_image_mat_ = imread(selected_image_filename_.toStdString(), IMREAD_GRAYSCALE);
-		if (current_image_mat_.empty())
-		{
-			MessageBoxHelper::ShowErrorDialog("An error occurred while attempting to display the image file");
-			return;
-		}
-
-		QPixmap image(file);
-		QPixmap scaled = image.scaled(QSize(IMAGE_WIDTH, IMAGE_HEIGHT));
-		original_image_->setPixmap(scaled);
-
-		// Binarize the selected image on a separate thread to have it ready for preview
-		auto thread_handle = std::async(std::launch::async, &CreateBinaryImagePreview,
-			std::ref(*this), std::ref(current_image_mat_), threshold_value_, threshold_mode_combo_box_->currentIndex(), false, std::ref(mutex_));
+		DisplaySelectedImageFile(selected_image_filename_);
 		});
 
 	// When the preview button is pressed, we only want to binarize the input image for previewing (don't perform any calibration work yet)
@@ -385,9 +454,19 @@ void CalibrateWidget::ConnectEventListeners()
 		DisplayCalibrationFactor();
 		});
 
-	connect(clear_lines_btn_.get(), &QPushButton::clicked, this, [this]()
-		{
-
-		});
 }
 
+void CalibrateWidget::SaveCurrentParametersToDatabase()
+{
+	tp_.enqueue([this]()
+		{
+			CalibrationGaugeParametersDAO dao;
+			dao.UpdateGaugeParameters(gauge_parameters_, [](bool query_status)
+				{
+					if (!query_status)
+					{
+						qDebug() << "Failed to update latest set calibration gauge parameters";
+					}
+				});
+		});
+}

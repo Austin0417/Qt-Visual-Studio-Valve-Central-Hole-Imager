@@ -10,6 +10,7 @@ void ValveCentralHole::InitializeUIElements() {
 
 	options_menu_.reset(menu_bar_->addMenu("Options"));
 	options_actions_.push_back(options_menu_->addAction("Helper Gauge Diameter Measure Tool"));
+	options_actions_.push_back(options_menu_->addAction("Apply Last Saved Gauge Parameters"));
 
 	// Removing the starting tabs from the QTabWidget
 	tab_widget->clear();
@@ -34,18 +35,26 @@ void ValveCentralHole::ConnectEventListeners() {
 		}
 		});
 
-	connect(options_menu_.get(), &QMenu::triggered, this, [this](QAction* triggered)
+	connect(options_actions_[GAUGE_HELPER_TOOL], &QAction::triggered, this, [this]()
 		{
-			qDebug() << "Activated action: " << triggered->text();
+			qDebug() << "Activated action: " << options_actions_[GAUGE_HELPER_TOOL]->text();
 			*is_gauge_helper_tool_active_ = !(*is_gauge_helper_tool_active_);
 			if (*is_gauge_helper_tool_active_)
 			{
-				triggered->setIcon(QIcon("checkmark_icon.png"));
+				options_actions_[GAUGE_HELPER_TOOL]->setIcon(QIcon("checkmark_icon.png"));
 			}
 			else
 			{
-				triggered->setIcon(QIcon(QPixmap()));
+				options_actions_[GAUGE_HELPER_TOOL]->setIcon(QIcon(QPixmap()));
 			}
+		});
+
+	connect(options_actions_[APPLY_LAST_SAVED_PARAMETERS], &QAction::triggered, this, [this]()
+		{
+			qDebug() << "Activated action: " << options_actions_[GAUGE_HELPER_TOOL]->text();
+
+			// Apply the last saved parameters to the Calibrate Widget
+			calibrate_tab_->ApplyLastSavedParameters();
 		});
 }
 

@@ -38,12 +38,12 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>Qt 6.6.2</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;gui;widgets;sql</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>Qt 6.6.2</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;gui;widgets;sql</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
@@ -70,7 +70,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\OpenCV\opencv\build\x64\vc16\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_world490.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_world490d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -79,7 +79,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\OpenCV\opencv\build\x64\vc16\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_world490.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_world490d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
@@ -114,6 +114,9 @@
     <QtMoc Include="ValveCentralHole.h" />
     <ClCompile Include="BinarizeImageHelper.cpp" />
     <ClCompile Include="CalibrateWidget.cpp" />
+    <ClCompile Include="CalibrationGaugeDiameterDAO.cpp" />
+    <ClCompile Include="CalibrationGaugeParameters.cpp" />
+    <ClCompile Include="Database.cpp" />
     <ClCompile Include="MeasureWidget.cpp" />
     <ClCompile Include="MessageBoxHelper.cpp" />
     <ClCompile Include="ThreadPool.cpp" />
@@ -125,6 +128,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BinarizeImageHelper.h" />
+    <ClInclude Include="CalibrationGaugeParametersDAO.h" />
+    <ClInclude Include="CalibrationGaugeParameters.h" />
+    <ClInclude Include="Database.h" />
     <ClInclude Include="ThreadPool.h" />
     <QtMoc Include="MeasureWidget.h" />
     <ClInclude Include="MessageBoxHelper.h" />
