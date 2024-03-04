@@ -1,4 +1,5 @@
 #include "ValveCentralHole.h"
+#include "CameraDisplayDialog.h"
 
 
 void ValveCentralHole::InitializeUIElements() {
@@ -11,6 +12,7 @@ void ValveCentralHole::InitializeUIElements() {
 	options_menu_.reset(menu_bar_->addMenu("Options"));
 	options_actions_.push_back(options_menu_->addAction("Helper Gauge Diameter Measure Tool"));
 	options_actions_.push_back(options_menu_->addAction("Apply Last Saved Gauge Parameters"));
+	options_actions_.push_back(options_menu_->addAction("Activate Camera"));
 
 	// Removing the starting tabs from the QTabWidget
 	tab_widget->clear();
@@ -55,6 +57,16 @@ void ValveCentralHole::ConnectEventListeners() {
 
 			// Apply the last saved parameters to the Calibrate Widget
 			calibrate_tab_->ApplyLastSavedParameters();
+		});
+
+	connect(options_actions_[CAMERA], &QAction::triggered, this, [this]()
+		{
+			CameraDisplayDialog* camera_dialog = new CameraDisplayDialog(this);
+			camera_dialog->SetOnCameraCompleteCallback([this](Mat confirmed_mat, const QString& image_name)
+				{
+					calibrate_tab_->ReceiveAndDisplayCameraImage(image_name);
+				});
+			camera_dialog->show();
 		});
 }
 

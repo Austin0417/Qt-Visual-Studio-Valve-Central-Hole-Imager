@@ -49,7 +49,7 @@ public:
     {
         if (CalibrateWidget->objectName().isEmpty())
             CalibrateWidget->setObjectName("CalibrateWidget");
-        CalibrateWidget->resize(1256, 720);
+        CalibrateWidget->resize(1258, 720);
         CalibrateWidget->setStyleSheet(QString::fromUtf8(""));
         label = new QLabel(CalibrateWidget);
         label->setObjectName("label");

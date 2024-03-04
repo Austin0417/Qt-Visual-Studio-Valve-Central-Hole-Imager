@@ -38,12 +38,12 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>Qt 6.6.2</QtInstall>
-    <QtModules>core;gui;widgets;sql</QtModules>
+    <QtModules>core;gui;widgets;multimedia;sql</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>Qt 6.6.2</QtInstall>
-    <QtModules>core;gui;widgets;sql</QtModules>
+    <QtModules>core;gui;widgets;multimedia;sql</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
@@ -109,6 +109,8 @@
   <ItemGroup>
     <QtRcc Include="ValveCentralHole.qrc" />
     <QtUic Include="CalibrateWidget.ui" />
+    <QtUic Include="CameraConfirmation.ui" />
+    <QtUic Include="CameraDisplayDialog.ui" />
     <QtUic Include="MeasureWidget.ui" />
     <QtUic Include="ValveCentralHole.ui" />
     <QtMoc Include="ValveCentralHole.h" />
@@ -116,6 +118,9 @@
     <ClCompile Include="CalibrateWidget.cpp" />
     <ClCompile Include="CalibrationGaugeDiameterDAO.cpp" />
     <ClCompile Include="CalibrationGaugeParameters.cpp" />
+    <ClCompile Include="CameraConfirmationDialog.cpp" />
+    <ClCompile Include="CameraConfirmLabel.cpp" />
+    <ClCompile Include="CameraDisplayDialog.cpp" />
     <ClCompile Include="Database.cpp" />
     <ClCompile Include="MeasureWidget.cpp" />
     <ClCompile Include="MessageBoxHelper.cpp" />
@@ -130,6 +135,9 @@
     <ClInclude Include="BinarizeImageHelper.h" />
     <ClInclude Include="CalibrationGaugeParametersDAO.h" />
     <ClInclude Include="CalibrationGaugeParameters.h" />
+    <QtMoc Include="CameraDisplayDialog.h" />
+    <ClInclude Include="CameraConfirmationDialog.h" />
+    <ClInclude Include="CameraConfirmLabel.h" />
     <ClInclude Include="Database.h" />
     <ClInclude Include="ThreadPool.h" />
     <QtMoc Include="MeasureWidget.h" />

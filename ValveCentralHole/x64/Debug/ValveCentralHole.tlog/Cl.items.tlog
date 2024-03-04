@@ -2,6 +2,9 @@ C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\BinarizeImage
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\CalibrateWidget.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\CalibrateWidget.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\CalibrationGaugeDiameterDAO.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\CalibrationGaugeDiameterDAO.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\CalibrationGaugeParameters.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\CalibrationGaugeParameters.obj
+C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\CameraConfirmationDialog.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\CameraConfirmationDialog.obj
+C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\CameraConfirmLabel.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\CameraConfirmLabel.obj
+C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\CameraDisplayDialog.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\CameraDisplayDialog.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\Database.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\Database.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\MeasureWidget.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\MeasureWidget.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\MessageBoxHelper.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\MessageBoxHelper.obj
@@ -10,5 +13,6 @@ C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\ValveCentralH
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\main.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\main.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\rcc\qrc_ValveCentralHole.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\qrc_ValveCentralHole.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\moc\moc_ValveCentralHole.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\moc_ValveCentralHole.obj
-C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\moc\moc_MeasureWidget.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\moc_MeasureWidget.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\moc\moc_CalibrateWidget.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\moc_CalibrateWidget.obj
+C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\moc\moc_CameraDisplayDialog.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\moc_CameraDisplayDialog.obj
+C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\moc\moc_MeasureWidget.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\moc_MeasureWidget.obj

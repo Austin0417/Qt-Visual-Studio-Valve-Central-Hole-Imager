@@ -157,9 +157,26 @@ void CalibrateWidget::ApplyLastSavedParameters()
 	diameter_unit_selection_->setCurrentIndex(static_cast<int>(gauge_parameters_.GetUnitSelection()));
 	threshold_mode_combo_box_->setCurrentIndex(static_cast<int>(gauge_parameters_.GetThresholdMode()));
 	threshold_value_label_->setText(QString::number(gauge_parameters_.GetThresholdValue()));
-	DisplaySelectedImageFile(gauge_parameters_.GetImageFileName(), true);
+	DisplaySelectedImage(gauge_parameters_.GetImageFileName(), true);
 }
 
+void CalibrateWidget::ReceiveAndDisplayCameraImage(Mat mat_from_camera)
+{
+	// Grayscale the captured image
+	cvtColor(mat_from_camera, mat_from_camera, COLOR_BGR2GRAY);
+
+	// Resize the mat to be the correct dimensions so that it can be displayed
+	cv::resize(mat_from_camera, mat_from_camera, Size(IMAGE_WIDTH, IMAGE_HEIGHT), 0, 0, INTER_CUBIC);
+
+	current_image_mat_ = mat_from_camera;
+	imshow("Result Image", current_image_mat_);
+	DisplaySelectedImage(current_image_mat_, true);
+}
+
+void CalibrateWidget::ReceiveAndDisplayCameraImage(const QString& image_name)
+{
+	DisplaySelectedImage(image_name, true);
+}
 
 double CalibrateWidget::GetGaugeDiameter() {
 	return gauge_diameter_;
@@ -173,7 +190,7 @@ double CalibrateWidget::GetCalibrationFactor() {
 	return calibration_factor_;
 }
 
-void CalibrateWidget::DisplaySelectedImageFile(const QString& filename, bool is_update)
+void CalibrateWidget::DisplaySelectedImage(const QString& filename, bool should_show_binary_immediately)
 {
 	current_image_mat_ = imread(selected_image_filename_.toStdString(), IMREAD_GRAYSCALE);
 	if (current_image_mat_.empty())
@@ -189,9 +206,26 @@ void CalibrateWidget::DisplaySelectedImageFile(const QString& filename, bool is_
 	gauge_parameters_.SetImageFileName(selected_image_filename_);
 	SaveCurrentParametersToDatabase();
 
+	isCurrentlyShowingPreview = true;
 	// Binarize the selected image on a separate thread to have it ready for preview
 	auto thread_handle = std::async(std::launch::async, &CreateBinaryImagePreview,
-		std::ref(*this), std::ref(current_image_mat_), threshold_value_, threshold_mode_combo_box_->currentIndex(), is_update, std::ref(mutex_));
+		std::ref(*this), std::ref(current_image_mat_), threshold_value_, threshold_mode_combo_box_->currentIndex(), should_show_binary_immediately, std::ref(mutex_));
+}
+
+void CalibrateWidget::DisplaySelectedImage(Mat selected_mat, bool should_show_binary_immediately)
+{
+	if (current_image_mat_.empty())
+	{
+		MessageBoxHelper::ShowErrorDialog("An error occurred while attempting to display the image file");
+		return;
+	}
+
+	QImage image(current_image_mat_.data, current_image_mat_.cols, current_image_mat_.rows, QImage::Format_Grayscale8);
+	original_image_->setPixmap(QPixmap::fromImage(image).scaled(IMAGE_WIDTH, IMAGE_HEIGHT));
+
+	isCurrentlyShowingPreview = true;
+	auto thread_handle = std::async(std::launch::async, &CreateBinaryImagePreview,
+		std::ref(*this), std::ref(current_image_mat_), threshold_value_, threshold_mode_combo_box_->currentIndex(), should_show_binary_immediately, std::ref(mutex_));
 }
 
 
@@ -399,7 +433,7 @@ void CalibrateWidget::ConnectEventListeners()
 			return;
 		}
 		selected_image_filename_ = file;
-		DisplaySelectedImageFile(selected_image_filename_);
+		DisplaySelectedImage(selected_image_filename_);
 		});
 
 	// When the preview button is pressed, we only want to binarize the input image for previewing (don't perform any calibration work yet)

@@ -64,6 +64,15 @@
     <ClCompile Include="CalibrationGaugeParameters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CameraDisplayDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraConfirmationDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraConfirmLabel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="CalibrateWidget.ui">
@@ -72,12 +81,21 @@
     <QtUic Include="MeasureWidget.ui">
       <Filter>Form Files</Filter>
     </QtUic>
+    <QtUic Include="CameraDisplayDialog.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="CameraConfirmation.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="CalibrateWidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="MeasureWidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="CameraDisplayDialog.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
@@ -98,6 +116,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CalibrationGaugeParameters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraConfirmationDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraConfirmLabel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
