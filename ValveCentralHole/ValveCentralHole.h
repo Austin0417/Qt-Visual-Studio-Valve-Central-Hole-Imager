@@ -13,7 +13,8 @@
 enum OptionsMenuSelection
 {
 	GAUGE_HELPER_TOOL,
-	APPLY_LAST_SAVED_PARAMETERS
+	APPLY_LAST_SAVED_PARAMETERS,
+	CAMERA
 };
 
 class ValveCentralHole : public QMainWindow

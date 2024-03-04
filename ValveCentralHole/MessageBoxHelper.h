@@ -6,7 +6,7 @@
 class MessageBoxHelper
 {
 public:
-    MessageBoxHelper();
-    void static ShowErrorDialog(const QString& error_msg);
+	MessageBoxHelper();
+	static int ShowErrorDialog(const QString& error_msg);
 };
 

@@ -43,8 +43,6 @@ QT_END_NAMESPACE
 
 
 
-
-
 QString GetUnitSuffix(UnitSelection current_unit_selection);
 
 class CalibrateWidget : public QWidget
@@ -58,10 +56,10 @@ public:
 	void SetPreviewMat(Mat preview_mat);
 	const ThreadPool& GetWidgetThreadPool() const;
 	void ApplyLastSavedParameters();
-
+	void ReceiveAndDisplayCameraImage(Mat mat_from_camera);
+	void ReceiveAndDisplayCameraImage(const QString& image_name);
 
 	static UnitSelection current_unit_selection_;
-
 
 signals:
 	void UpdatePreviewMat();
@@ -114,7 +112,8 @@ private:
 	void InitializeUIElements();
 	void CheckForLastCalibrationParameters();
 	void ConnectEventListeners();
-	void DisplaySelectedImageFile(const QString& filename, bool is_update = false);
+	void DisplaySelectedImage(const QString& filename, bool should_show_binary_immediately = false);
+	void DisplaySelectedImage(Mat selected_mat, bool should_show_binary_immediately = false);
 	void DisplayPreviewMat();
 	void DisplayCalibrationFactor();
 	void SaveCurrentParametersToDatabase();
