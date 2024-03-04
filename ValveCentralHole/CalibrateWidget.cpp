@@ -192,7 +192,7 @@ double CalibrateWidget::GetCalibrationFactor() {
 
 void CalibrateWidget::DisplaySelectedImage(const QString& filename, bool should_show_binary_immediately)
 {
-	current_image_mat_ = imread(selected_image_filename_.toStdString(), IMREAD_GRAYSCALE);
+	current_image_mat_ = imread(filename.toStdString(), IMREAD_GRAYSCALE);
 	if (current_image_mat_.empty())
 	{
 		MessageBoxHelper::ShowErrorDialog("An error occurred while attempting to display the image file");
@@ -203,7 +203,7 @@ void CalibrateWidget::DisplaySelectedImage(const QString& filename, bool should_
 	QPixmap scaled = image.scaled(QSize(IMAGE_WIDTH, IMAGE_HEIGHT));
 	original_image_->setPixmap(scaled);
 
-	gauge_parameters_.SetImageFileName(selected_image_filename_);
+	gauge_parameters_.SetImageFileName(filename);
 	SaveCurrentParametersToDatabase();
 
 	isCurrentlyShowingPreview = true;
