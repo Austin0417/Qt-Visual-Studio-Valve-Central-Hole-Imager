@@ -4,6 +4,8 @@
 #include "BinarizeImageHelper.h"
 #include "ui_CalibrateWidget.h"
 #include "ThreadPool.h"
+#include "ImageCropDialog.h"
+#include "CalibrationGaugeLabel.h"
 #include <QObject>
 #include <QComboBox>
 #include <QString>
@@ -64,10 +66,7 @@ public:
 signals:
 	void UpdatePreviewMat();
 	void OnCalibrationComplete(double calibration_factor);
-
-protected:
-	virtual void paintEvent(QPaintEvent* event) override;
-	virtual void mouseDoubleClickEvent(QMouseEvent* event) override;
+	void ShouldClearHelperGaugeLines();
 
 private:
 	Ui::CalibrateWidget* ui;
@@ -100,14 +99,16 @@ private:
 	std::unique_ptr<QFileDialog> file_select_;
 	std::unique_ptr<QPushButton> select_file_button_;
 	std::unique_ptr<QVBoxLayout> widget_layout_;
-	std::unique_ptr<QLabel> original_image_;
-	std::unique_ptr<QLabel> binarized_image_;
+	std::unique_ptr<CalibrationGaugeLabel> original_image_;
+	std::unique_ptr<CalibrationGaugeLabel> binarized_image_;
 	std::unique_ptr<QPushButton> preview_btn_;
 	std::unique_ptr<QPushButton> calibrate_btn_;
 	std::unique_ptr<QLabel> calibration_factor_label_;
 	std::unique_ptr<QLabel> threshold_mode_tooltip_label_;
 	std::unique_ptr<QLabel> saline_tooltip_label_;
 	std::unique_ptr<QPushButton> clear_lines_btn_;
+	std::unique_ptr<QPushButton> crop_image_btn_;
+	std::unique_ptr<QPushButton> clear_image_btn_;
 
 	void InitializeUIElements();
 	void CheckForLastCalibrationParameters();
