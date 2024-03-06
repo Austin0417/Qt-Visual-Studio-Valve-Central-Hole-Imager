@@ -30,8 +30,18 @@ void CameraConfirmLabel::paintEvent(QPaintEvent* event)
 		QPixmap label_pixmap = pixmap();
 		QPainter painter(&label_pixmap);
 		painter.setPen(QPen(QBrush(QColor(255, 0, 0)), 5));
-		painter.drawRect(rectangle_start_point.x(), rectangle_start_point.y() + RECT_HEIGHT_OFFSET,
-			rectangle_end_point.x() - rectangle_start_point.x(), rectangle_end_point.y() - rectangle_start_point.y());
+
+		if (should_apply_y_offset)
+		{
+			painter.drawRect(rectangle_start_point.x(), rectangle_start_point.y() + RECT_HEIGHT_OFFSET,
+				rectangle_end_point.x() - rectangle_start_point.x(), rectangle_end_point.y() - rectangle_start_point.y());
+		}
+		else
+		{
+			painter.drawRect(rectangle_start_point.x(), rectangle_start_point.y(),
+				rectangle_end_point.x() - rectangle_start_point.x(), rectangle_end_point.y() - rectangle_start_point.y());
+		}
+
 		setPixmap(label_pixmap);
 
 		// This if statement will be true after the user is done dragging their mouse
@@ -43,16 +53,30 @@ void CameraConfirmLabel::paintEvent(QPaintEvent* event)
 			// In the case of right to left, the start point's x coordinate will be larger than the end point's x coordinate, so we should send the x coordinate of the end point instead
 			if (rectangle_start_point.x() < rectangle_end_point.x())
 			{
-				crop_callback_(rectangle_start_point.x(), rectangle_start_point.y() + RECT_HEIGHT_OFFSET,
-					rectangle_end_point.x() - rectangle_start_point.x(), rectangle_end_point.y() - rectangle_start_point.y());
+				if (should_apply_y_offset)
+				{
+					crop_callback_(rectangle_start_point.x(), rectangle_start_point.y() + RECT_HEIGHT_OFFSET,
+						rectangle_end_point.x() - rectangle_start_point.x(), rectangle_end_point.y() - rectangle_start_point.y());
+				}
+				else
+				{
+					crop_callback_(rectangle_start_point.x(), rectangle_start_point.y(),
+						rectangle_end_point.x() - rectangle_start_point.x(), rectangle_end_point.y() - rectangle_start_point.y());
+				}
 			}
 			else if (rectangle_start_point.x() > rectangle_end_point.x())
 			{
-				crop_callback_(rectangle_end_point.x(), rectangle_start_point.y() + RECT_HEIGHT_OFFSET,
-					rectangle_end_point.x() - rectangle_start_point.x(), rectangle_end_point.y() - rectangle_start_point.y());
+				if (should_apply_y_offset)
+				{
+					crop_callback_(rectangle_start_point.x(), rectangle_start_point.y() + RECT_HEIGHT_OFFSET,
+						rectangle_end_point.x() - rectangle_start_point.x(), rectangle_end_point.y() - rectangle_start_point.y());
+				}
+				else
+				{
+					crop_callback_(rectangle_end_point.x(), rectangle_start_point.y(),
+						rectangle_end_point.x() - rectangle_start_point.x(), rectangle_end_point.y() - rectangle_start_point.y());
+				}
 			}
-
-
 			rectangle_start_point = QPoint();
 		}
 		rectangle_end_point = QPoint();
@@ -101,3 +125,8 @@ void CameraConfirmLabel::ClearCropLines()
 	}
 }
 
+
+void CameraConfirmLabel::SetShouldApplyYOffset(bool flag)
+{
+	should_apply_y_offset = flag;
+}

@@ -44,12 +44,14 @@ public:
     QLabel *threshold_mode_tooltip_;
     QLabel *saline_tooltip;
     QPushButton *clear_lines;
+    QPushButton *crop_image_btn;
+    QPushButton *clear_image_btn;
 
     void setupUi(QWidget *CalibrateWidget)
     {
         if (CalibrateWidget->objectName().isEmpty())
             CalibrateWidget->setObjectName("CalibrateWidget");
-        CalibrateWidget->resize(1258, 720);
+        CalibrateWidget->resize(1240, 720);
         CalibrateWidget->setStyleSheet(QString::fromUtf8(""));
         label = new QLabel(CalibrateWidget);
         label->setObjectName("label");
@@ -126,6 +128,14 @@ public:
         clear_lines = new QPushButton(CalibrateWidget);
         clear_lines->setObjectName("clear_lines");
         clear_lines->setGeometry(QRect(1060, 20, 151, 24));
+        crop_image_btn = new QPushButton(CalibrateWidget);
+        crop_image_btn->setObjectName("crop_image_btn");
+        crop_image_btn->setGeometry(QRect(40, 110, 151, 31));
+        crop_image_btn->setStyleSheet(QString::fromUtf8("background: white;"));
+        clear_image_btn = new QPushButton(CalibrateWidget);
+        clear_image_btn->setObjectName("clear_image_btn");
+        clear_image_btn->setGeometry(QRect(40, 140, 151, 31));
+        clear_image_btn->setStyleSheet(QString::fromUtf8("background: white;"));
 
         retranslateUi(CalibrateWidget);
 
@@ -151,6 +161,8 @@ public:
         threshold_mode_tooltip_->setText(QString());
         saline_tooltip->setText(QString());
         clear_lines->setText(QCoreApplication::translate("CalibrateWidget", "Clear Gauge Helper Lines", nullptr));
+        crop_image_btn->setText(QCoreApplication::translate("CalibrateWidget", "Crop Image", nullptr));
+        clear_image_btn->setText(QCoreApplication::translate("CalibrateWidget", "Clear Image", nullptr));
     } // retranslateUi
 
 };

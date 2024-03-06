@@ -12,6 +12,7 @@ private:
 	QPixmap original_pixmap_;
 	std::function<void(int, int, int, int)> crop_callback_;
 	bool is_user_currently_dragging_ = false;
+	bool should_apply_y_offset = false;
 public:
 	CameraConfirmLabel(bool& is_crop_enabled, QWidget* parent = nullptr) : is_crop_enabled_(is_crop_enabled), QLabel(parent) {}
 	void SetCropCallback(const std::function<void(int, int, int, int)>& callback);
@@ -20,5 +21,6 @@ public:
 	virtual void mouseMoveEvent(QMouseEvent* event) override;
 	virtual void paintEvent(QPaintEvent* event) override;
 	void ClearCropLines();
+	void SetShouldApplyYOffset(bool flag);
 };
 

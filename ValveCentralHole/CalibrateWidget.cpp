@@ -33,6 +33,7 @@ static void CreateBinaryImagePreview(CalibrateWidget& calibrate_widget, const Ma
 		calibrate_widget.SetPreviewMat(temp);
 	}
 
+
 	// Check if the image mat is extremely large (5000+ pixels in both directions)
 	// If it is, we should only update when the sliders stops moving, or it'll lag too much
 	if (temp.rows >= 5000 && temp.cols >= 5000)
@@ -59,6 +60,15 @@ static void CreateBinaryImagePreview(CalibrateWidget& calibrate_widget, const Ma
 				}
 			});
 	}
+
+}
+
+static void CalibrationGaugeLabelCallback(const QPoint& start, const QPoint& end)
+{
+	// Calculate the line length
+	qDebug() << "Drawn line length: " << std::abs(end.x() - start.x());
+
+	// TODO Display the length of the drawn lines in pixels to the user, and implement a "mirror" feature that will draw the line in the binary image as well
 }
 
 QString GetUnitSuffix(UnitSelection unit_selection_)
@@ -90,48 +100,6 @@ CalibrateWidget::CalibrateWidget(const std::unique_ptr<bool>& gauge_helper_flag,
 	CheckForLastCalibrationParameters();
 	InitializeUIElements();
 	ConnectEventListeners();
-}
-
-void CalibrateWidget::paintEvent(QPaintEvent* event)
-{
-	QPainter painter(this);
-	QPen pen(QBrush(QColor(255, 0, 0)), 10);
-	painter.setPen(pen);
-
-	for (auto& line_pair : line_points_)
-	{
-		// If the pair of points differ in their y coordinates, make the second point match the first's y coordinate
-		// This is to make it so only straight lines are drawn
-		if (line_pair.first.y() != line_pair.second.y())
-		{
-			QPointF& second_point = line_pair.second;
-			second_point.setY(line_pair.first.y());
-		}
-		painter.drawLine(line_pair.first, line_pair.second);
-	}
-}
-
-
-void CalibrateWidget::mouseDoubleClickEvent(QMouseEvent* event)
-{
-	if (*gauge_helper_flag_)
-	{
-		qDebug() << "Drawing line at (" << event->position().x() << ", " << event->position().y() << ")";
-		if (is_on_line_start_)
-		{
-			start_line_ = event->position();
-		}
-		else
-		{
-			end_line_ = event->position();
-			current_line_point_pair_ = std::make_pair(start_line_, end_line_);
-			line_points_.push_back(current_line_point_pair_);
-			update();
-		}
-		is_on_line_start_ = !is_on_line_start_;
-	}
-	QWidget::mouseDoubleClickEvent(event);
-
 }
 
 
@@ -206,7 +174,11 @@ void CalibrateWidget::DisplaySelectedImage(const QString& filename, bool should_
 	gauge_parameters_.SetImageFileName(filename);
 	SaveCurrentParametersToDatabase();
 
-	isCurrentlyShowingPreview = true;
+	if (should_show_binary_immediately)
+	{
+		isCurrentlyShowingPreview = true;
+	}
+
 	// Binarize the selected image on a separate thread to have it ready for preview
 	auto thread_handle = std::async(std::launch::async, &CreateBinaryImagePreview,
 		std::ref(*this), std::ref(current_image_mat_), threshold_value_, threshold_mode_combo_box_->currentIndex(), should_show_binary_immediately, std::ref(mutex_));
@@ -223,7 +195,11 @@ void CalibrateWidget::DisplaySelectedImage(Mat selected_mat, bool should_show_bi
 	QImage image(current_image_mat_.data, current_image_mat_.cols, current_image_mat_.rows, QImage::Format_Grayscale8);
 	original_image_->setPixmap(QPixmap::fromImage(image).scaled(IMAGE_WIDTH, IMAGE_HEIGHT));
 
-	isCurrentlyShowingPreview = true;
+	if (should_show_binary_immediately)
+	{
+		isCurrentlyShowingPreview = true;
+	}
+
 	auto thread_handle = std::async(std::launch::async, &CreateBinaryImagePreview,
 		std::ref(*this), std::ref(current_image_mat_), threshold_value_, threshold_mode_combo_box_->currentIndex(), should_show_binary_immediately, std::ref(mutex_));
 }
@@ -263,14 +239,28 @@ void CalibrateWidget::InitializeUIElements()
 	is_saline_checkbox_.reset(ui->is_saline_selection);
 	threshold_value_label_.reset(ui->threshold_value_display);
 	select_file_button_.reset(ui->select_image_file);
-	original_image_.reset(ui->original_image);
-	binarized_image_.reset(ui->binarized_image);
 	preview_btn_.reset(ui->preview_btn);
 	calibrate_btn_.reset(ui->calibrate_btn);
 	calibration_factor_label_.reset(ui->calibration_factor_label);
 	threshold_mode_tooltip_label_.reset(ui->threshold_mode_tooltip_);
 	saline_tooltip_label_.reset(ui->saline_tooltip);
 	clear_lines_btn_.reset(ui->clear_lines);
+	crop_image_btn_.reset(ui->crop_image_btn);
+	clear_image_btn_.reset(ui->clear_image_btn);
+
+	original_image_ = std::make_unique<CalibrationGaugeLabel>(gauge_helper_flag_, this);
+	binarized_image_ = std::make_unique<CalibrationGaugeLabel>(gauge_helper_flag_, this);
+	original_image_->setFixedWidth(IMAGE_WIDTH);
+	original_image_->setFixedHeight(IMAGE_HEIGHT);
+	binarized_image_->setFixedWidth(IMAGE_WIDTH);
+	binarized_image_->setFixedHeight(IMAGE_HEIGHT);
+	original_image_->move(10, 220);
+	binarized_image_->move(640, 220);
+	original_image_->setStyleSheet("background: brown;");
+	binarized_image_->setStyleSheet("background: brown;");
+	original_image_->SetOnMouseReleaseCallback(&CalibrationGaugeLabelCallback);
+	binarized_image_->SetOnMouseReleaseCallback(&CalibrationGaugeLabelCallback);
+
 
 	clear_lines_btn_->setVisible(false);
 
@@ -488,6 +478,36 @@ void CalibrateWidget::ConnectEventListeners()
 		DisplayCalibrationFactor();
 		});
 
+	connect(crop_image_btn_.get(), &QPushButton::clicked, this, [this]()
+		{
+			if (current_image_mat_.empty())
+			{
+				MessageBoxHelper::ShowErrorDialog("An input image must be selected before cropping");
+				return;
+			}
+			ImageCropDialog* crop_dialog = new ImageCropDialog(current_image_mat_.clone(), this);
+			crop_dialog->SetConfirmCallback([this](const QString& cropped_image_file_name)
+				{
+					DisplaySelectedImage(cropped_image_file_name);
+					//current_image_mat_ = current_image_mat_(Rect(cropped_region.x(), cropped_region.y(), cropped_region.width(), cropped_region.height()));
+				});
+			crop_dialog->exec();
+		});
+
+	connect(clear_image_btn_.get(), &QPushButton::clicked, this, [this]()
+		{
+			// Clear the current mat and binarized mat variables, and clear the pixmaps for the labels as well
+			current_image_mat_ = Mat();
+			binarized_preview_image_mat_ = Mat();
+			original_image_->setPixmap(QPixmap());
+			binarized_image_->setPixmap(QPixmap());
+		});
+
+	connect(this, &CalibrateWidget::ShouldClearHelperGaugeLines, this, [this]()
+		{
+			original_image_->ClearDrawnLines();
+			binarized_image_->ClearDrawnLines();
+		});
 }
 
 void CalibrateWidget::SaveCurrentParametersToDatabase()

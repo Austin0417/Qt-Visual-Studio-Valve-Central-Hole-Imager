@@ -32,7 +32,7 @@ private:
 	std::unique_ptr<CalibrateWidget> calibrate_tab_;
 	std::unique_ptr<MeasureWidget> measure_tab_;
 	std::unique_ptr<QMenu> options_menu_;
-	std::vector<QAction*> options_actions_;
+	QMenu* helper_tool_submenu_;
 	std::unique_ptr<bool> is_gauge_helper_tool_active_;
 
 	void InitializeUIElements();

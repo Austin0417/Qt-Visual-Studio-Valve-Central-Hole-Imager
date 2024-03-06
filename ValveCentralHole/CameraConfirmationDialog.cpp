@@ -36,6 +36,7 @@ void CameraConfirmationDialog::InitializeUiElements()
 			// When the user crops the image, we will store the resulting sub matrix
 			cropped_captured_mat_ = captured_mat_(Rect(x, y, std::abs(width), std::abs(height)));
 		});
+	displayed_mat_label_->SetShouldApplyYOffset(true);
 
 	displayed_mat_label_->setPixmap(QPixmap::fromImage(QImage(captured_mat_.data, captured_mat_.cols,
 		captured_mat_.rows, QImage::Format_BGR888)).scaled(DIALOG_WIDTH, DIALOG_HEIGHT));

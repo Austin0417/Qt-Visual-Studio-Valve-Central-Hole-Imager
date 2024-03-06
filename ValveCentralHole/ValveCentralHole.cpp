@@ -10,9 +10,17 @@ void ValveCentralHole::InitializeUIElements() {
 	measure_tab_ = std::make_unique<MeasureWidget>(this);
 
 	options_menu_.reset(menu_bar_->addMenu("Options"));
-	options_actions_.push_back(options_menu_->addAction("Helper Gauge Diameter Measure Tool"));
-	options_actions_.push_back(options_menu_->addAction("Apply Last Saved Gauge Parameters"));
-	options_actions_.push_back(options_menu_->addAction("Activate Camera"));
+	helper_tool_submenu_ = new QMenu("Helper Gauge Diameter Measure Tool");
+	options_menu_->addMenu(helper_tool_submenu_);
+
+	helper_tool_submenu_->addAction("Toggle");
+	QAction* mirror_action = new QAction("Mirror Drawn Line to Binary");
+	mirror_action->setEnabled(false);
+	helper_tool_submenu_->addAction(mirror_action);
+	helper_tool_submenu_->addAction("Clear Gauge Helper Lines");
+
+	options_menu_->addAction("Apply Last Saved Gauge Parameters");
+	options_menu_->addAction("Activate Camera");
 
 	// Removing the starting tabs from the QTabWidget
 	tab_widget->clear();
@@ -37,37 +45,65 @@ void ValveCentralHole::ConnectEventListeners() {
 		}
 		});
 
-	connect(options_actions_[GAUGE_HELPER_TOOL], &QAction::triggered, this, [this]()
+	QList<QAction*> options_menu_actions = options_menu_->actions();
+	if (!options_menu_actions.empty())
+	{
+		for (QAction* action : options_menu_actions)
 		{
-			qDebug() << "Activated action: " << options_actions_[GAUGE_HELPER_TOOL]->text();
-			*is_gauge_helper_tool_active_ = !(*is_gauge_helper_tool_active_);
-			if (*is_gauge_helper_tool_active_)
+
+			if (action->text() == "Apply Last Saved Gauge Parameters")
 			{
-				options_actions_[GAUGE_HELPER_TOOL]->setIcon(QIcon("checkmark_icon.png"));
+				connect(action, &QAction::triggered, this, [this]()
+					{
+						// Apply the last saved parameters to the Calibrate Widget
+						calibrate_tab_->ApplyLastSavedParameters();
+					});
+			}
+			else if (action->text() == "Activate Camera")
+			{
+				connect(action, &QAction::triggered, this, [this]()
+					{
+						CameraDisplayDialog* camera_dialog = new CameraDisplayDialog(this);
+						camera_dialog->SetOnCameraCompleteCallback([this](Mat confirmed_mat, const QString& image_name)
+							{
+								calibrate_tab_->ReceiveAndDisplayCameraImage(image_name);
+							});
+						camera_dialog->show();
+					});
+			}
+		}
+	}
+
+	QList<QAction*> helper_tool_submenu_actions = helper_tool_submenu_->actions();
+	if (!helper_tool_submenu_actions.empty())
+	{
+		for (QAction* action : helper_tool_submenu_actions)
+		{
+			if (action->text() == "Toggle")
+			{
+				connect(action, &QAction::triggered, this, [this, action]()
+					{
+						*is_gauge_helper_tool_active_ = !(*is_gauge_helper_tool_active_);
+						if (*is_gauge_helper_tool_active_)
+						{
+							action->setIcon(QIcon("checkmark_icon.png"));
+						}
+						else
+						{
+							action->setIcon(QIcon());
+						}
+					});
 			}
 			else
 			{
-				options_actions_[GAUGE_HELPER_TOOL]->setIcon(QIcon(QPixmap()));
+				connect(action, &QAction::triggered, this, [this]()
+					{
+						// TODO Clear gauge helper lines here
+						emit calibrate_tab_->ShouldClearHelperGaugeLines();
+					});
 			}
-		});
-
-	connect(options_actions_[APPLY_LAST_SAVED_PARAMETERS], &QAction::triggered, this, [this]()
-		{
-			qDebug() << "Activated action: " << options_actions_[GAUGE_HELPER_TOOL]->text();
-
-			// Apply the last saved parameters to the Calibrate Widget
-			calibrate_tab_->ApplyLastSavedParameters();
-		});
-
-	connect(options_actions_[CAMERA], &QAction::triggered, this, [this]()
-		{
-			CameraDisplayDialog* camera_dialog = new CameraDisplayDialog(this);
-			camera_dialog->SetOnCameraCompleteCallback([this](Mat confirmed_mat, const QString& image_name)
-				{
-					calibrate_tab_->ReceiveAndDisplayCameraImage(image_name);
-				});
-			camera_dialog->show();
-		});
+		}
+	}
 }
 
 

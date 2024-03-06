@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1258</width>
+    <width>1240</width>
     <height>720</height>
    </rect>
   </property>
@@ -307,6 +307,38 @@
    </property>
    <property name="text">
     <string>Clear Gauge Helper Lines</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="crop_image_btn">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>110</y>
+     <width>151</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background: white;</string>
+   </property>
+   <property name="text">
+    <string>Crop Image</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="clear_image_btn">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>140</y>
+     <width>151</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background: white;</string>
+   </property>
+   <property name="text">
+    <string>Clear Image</string>
    </property>
   </widget>
  </widget>
