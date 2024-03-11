@@ -30,6 +30,8 @@ SelectImageCropDialog::SelectImageCropDialog(QString file, QWidget* parent) : im
 
 void SelectImageCropDialog::InitializeUIElements(QScreen* screen)
 {
+	reselect_image_btn_ = std::make_unique<QPushButton>(this);
+
 	image_label_ = std::make_unique<CameraConfirmLabel>(crop, this);
 	image_label_->setFixedWidth(screen->size().width() * 0.70);
 	image_label_->setFixedHeight(screen->size().height() * 0.70);
@@ -52,19 +54,29 @@ void SelectImageCropDialog::InitializeUIElements(QScreen* screen)
 	new_image_file_name_ = std::make_unique<QLineEdit>(this);
 	new_image_file_name_->setPlaceholderText("New Image File Name...");
 	new_image_file_name_->setVisible(false);
-	new_image_file_name_->move(save_as_new_file_checkbox_->pos().x() + 40, save_as_new_file_checkbox_->pos().y() + 50);
-
-	confirm_btn_ = std::make_unique<QPushButton>("Confirm", this);
-	confirm_btn_->move(new_image_file_name_->pos().x() + 28, new_image_file_name_->pos().y() + 50);
-	confirm_btn_->setEnabled(false);
+	new_image_file_name_->move(save_as_new_file_checkbox_->pos().x() + 20, save_as_new_file_checkbox_->pos().y() + 25);
 
 	reset_btn_ = std::make_unique<QPushButton>("Reset Image to Default", this);
-	reset_btn_->move(confirm_btn_->pos().x() - 20, image_label_->pos().y() + image_label_->height() + 30);
+	reset_btn_->move(checkbox_caption->x(), image_label_->pos().y() + image_label_->height() + 15);
+
+	confirm_btn_ = std::make_unique<QPushButton>("Confirm", this);
+	confirm_btn_->move((image_label_->x() + image_label_->width()) - confirm_btn_->width(), reset_btn_->y());
+	confirm_btn_->setEnabled(false);
+
+	file_dialog_ = std::make_unique<QFileDialog>(this);
+	file_dialog_->setFileMode(QFileDialog::Directory);
 }
 
 
 void SelectImageCropDialog::ConnectEventListeners()
 {
+	connect(reselect_image_btn_.get(), &QPushButton::clicked, this, [this]()
+		{
+			file_dialog_->setFileMode(QFileDialog::AnyFile);
+			is_reselecting_image_ = true;
+			file_dialog_->exec();
+		});
+
 	connect(save_as_new_file_checkbox_.get(), &QCheckBox::stateChanged, this, [this](int state)
 		{
 			switch (state)
@@ -107,8 +119,8 @@ void SelectImageCropDialog::ConnectEventListeners()
 					MessageBoxHelper::ShowErrorDialog("File name cannot be empty!");
 					return;
 				}
-				imwrite(new_image_file_name_->text().toStdString(), cropped_);
-				emit this->ShouldCloseDialog();
+				file_dialog_->setFileMode(QFileDialog::Directory);
+				file_dialog_->exec();
 			}
 			else
 			{
@@ -120,6 +132,36 @@ void SelectImageCropDialog::ConnectEventListeners()
 	connect(reset_btn_.get(), &QPushButton::clicked, this, [this]()
 		{
 			SetPixmapForLabel();
+		});
+
+	connect(file_dialog_.get(), &QFileDialog::fileSelected, this, [this](const QString& file)
+		{
+			// Directory select
+			if (!is_reselecting_image_)
+			{
+				qDebug() << "Selected directory: " << file;
+				latest_directory_entered_ = file;
+				if (imwrite((latest_directory_entered_ + "/" + new_image_file_name_->text()).toStdString(), cropped_))
+				{
+					this->close();
+					return;
+				}
+				MessageBoxHelper::ShowErrorDialog("An error occurred while trying to save the cropped image!");
+			}
+			// File select (reselecting image)
+			else
+			{
+				if (!file.contains(".jpg") && !file.contains(".png"))
+				{
+					MessageBoxHelper::ShowErrorDialog("Selected file was not a valid image format (.jpg/.png)");
+					return;
+				}
+
+				// Set the new pixmap and cv::Mat
+				image_label_->setPixmap(QPixmap(file).scaled(image_label_->width(), image_label_->height()));
+				
+			}
+
 		});
 
 	connect(this, &SelectImageCropDialog::ShouldCloseDialog, this, [this]()
