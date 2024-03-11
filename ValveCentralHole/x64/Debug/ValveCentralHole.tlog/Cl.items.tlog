@@ -1,4 +1,5 @@
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\BinarizeImageHelper.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\BinarizeImageHelper.obj
+C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\BinaryGaugeLabel.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\BinaryGaugeLabel.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\CalibrateWidget.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\CalibrateWidget.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\CalibrationGaugeDiameterDAO.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\CalibrationGaugeDiameterDAO.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\CalibrationGaugeLabel.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\CalibrationGaugeLabel.obj
@@ -10,6 +11,7 @@ C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\Database.cpp;
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\ImageCropDialog.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\ImageCropDialog.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\MeasureWidget.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\MeasureWidget.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\MessageBoxHelper.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\MessageBoxHelper.obj
+C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\SelectImageCropDialog.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\SelectImageCropDialog.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\ThreadPool.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\ThreadPool.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\ValveCentralHole.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\ValveCentralHole.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\main.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\main.obj
@@ -19,4 +21,5 @@ C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\moc
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\moc\moc_CalibrationGaugeLabel.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\moc_CalibrationGaugeLabel.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\moc\moc_CameraDisplayDialog.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\moc_CameraDisplayDialog.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\moc\moc_ImageCropDialog.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\moc_ImageCropDialog.obj
+C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\moc\moc_SelectImageCropDialog.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\moc_SelectImageCropDialog.obj
 C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\moc\moc_MeasureWidget.cpp;C:\Users\Austin Luu\source\repos\ValveCentralHole\ValveCentralHole\x64\Debug\moc_MeasureWidget.obj

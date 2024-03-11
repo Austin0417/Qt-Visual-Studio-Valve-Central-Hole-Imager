@@ -45,7 +45,7 @@ void CameraConfirmLabel::paintEvent(QPaintEvent* event)
 		setPixmap(label_pixmap);
 
 		// This if statement will be true after the user is done dragging their mouse
-		if (!is_user_currently_dragging_)
+		if (!is_user_currently_dragging_ && crop_callback_)
 		{
 			qDebug() << "Converting cropped image region into new cv::Mat...";
 

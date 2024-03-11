@@ -113,9 +113,11 @@
     <QtUic Include="CameraDisplayDialog.ui" />
     <QtUic Include="ImageCropDialog.ui" />
     <QtUic Include="MeasureWidget.ui" />
+    <QtUic Include="SelectImageCropDialog.ui" />
     <QtUic Include="ValveCentralHole.ui" />
     <QtMoc Include="ValveCentralHole.h" />
     <ClCompile Include="BinarizeImageHelper.cpp" />
+    <ClCompile Include="BinaryGaugeLabel.cpp" />
     <ClCompile Include="CalibrateWidget.cpp" />
     <ClCompile Include="CalibrationGaugeDiameterDAO.cpp" />
     <ClCompile Include="CalibrationGaugeLabel.cpp" />
@@ -127,6 +129,7 @@
     <ClCompile Include="ImageCropDialog.cpp" />
     <ClCompile Include="MeasureWidget.cpp" />
     <ClCompile Include="MessageBoxHelper.cpp" />
+    <ClCompile Include="SelectImageCropDialog.cpp" />
     <ClCompile Include="ThreadPool.cpp" />
     <ClCompile Include="ValveCentralHole.cpp" />
     <ClCompile Include="main.cpp" />
@@ -137,6 +140,7 @@
   <ItemGroup>
     <ClInclude Include="BinarizeImageHelper.h" />
     <QtMoc Include="CalibrationGaugeLabel.h" />
+    <ClInclude Include="BinaryGaugeLabel.h" />
     <ClInclude Include="CalibrationGaugeParametersDAO.h" />
     <ClInclude Include="CalibrationGaugeParameters.h" />
     <QtMoc Include="CameraDisplayDialog.h" />
@@ -144,6 +148,7 @@
     <ClInclude Include="CameraConfirmLabel.h" />
     <ClInclude Include="Database.h" />
     <QtMoc Include="ImageCropDialog.h" />
+    <QtMoc Include="SelectImageCropDialog.h" />
     <ClInclude Include="ThreadPool.h" />
     <QtMoc Include="MeasureWidget.h" />
     <ClInclude Include="MessageBoxHelper.h" />

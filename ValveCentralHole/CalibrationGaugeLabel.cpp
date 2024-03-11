@@ -1,7 +1,5 @@
 #include "CalibrationGaugeLabel.h"
-#include <QMouseEvent>
-#include <QPainter>
-#include <QBrush>
+
 
 CalibrationGaugeLabel::CalibrationGaugeLabel(const std::unique_ptr<bool>& toggle, QWidget* parent) : helper_lines_toggled(toggle), QLabel(parent)
 {
@@ -55,7 +53,6 @@ void CalibrationGaugeLabel::mouseMoveEvent(QMouseEvent* event)
 void CalibrationGaugeLabel::paintEvent(QPaintEvent* event)
 {
 	QLabel::paintEvent(event);
-
 	if (original_pixmap_.isNull() && !pixmap().isNull())
 	{
 		original_pixmap_ = pixmap().copy();
@@ -65,13 +62,15 @@ void CalibrationGaugeLabel::paintEvent(QPaintEvent* event)
 	{
 		if (!line_draw_start_.isNull() && !line_draw_end_.isNull())
 		{
-			setPixmap(original_pixmap_);
+			if (should_clear_on_repaint)
+			{
+				setPixmap(original_pixmap_);
+			}
 			QPixmap current_pixmap = pixmap();
 			QPainter painter(&current_pixmap);
 			QPen pen(QBrush(QColor(255, 0, 0)), 5);
 			painter.setPen(pen);
 			painter.drawLine(line_draw_start_, line_draw_end_);
-
 
 			if (!is_mouse_currently_dragging)
 			{
@@ -102,6 +101,36 @@ void CalibrationGaugeLabel::SetOnMouseReleaseCallback(const std::function<void(c
 	on_mouse_release_callback_ = callback;
 }
 
+
+void CalibrationGaugeLabel::SetLineStartPoint(const QPoint& start)
+{
+	line_draw_start_ = start;
+}
+
+void CalibrationGaugeLabel::SetLineEndPoint(const QPoint& end)
+{
+	line_draw_end_ = end;
+}
+
+void CalibrationGaugeLabel::SetCanDraw(bool draw_flag)
+{
+	can_draw_ = draw_flag;
+}
+
+void CalibrationGaugeLabel::SetShouldClearOnRepaint(bool flag)
+{
+	should_clear_on_repaint = flag;
+}
+
+
+void CalibrationGaugeLabel::PaintEventUpdate()
+{
+	// Temporarily set the can_draw flag to true so that the PaintEvent goes through
+	can_draw_ = true;
+	update();
+	can_draw_ = false;
+}
+
 void CalibrationGaugeLabel::ClearDrawnLines()
 {
 	if (!original_pixmap_.isNull())
@@ -109,4 +138,5 @@ void CalibrationGaugeLabel::ClearDrawnLines()
 		setPixmap(original_pixmap_);
 	}
 }
+
 

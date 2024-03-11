@@ -88,7 +88,7 @@ void MeasureWidget::SetPreviewMat(Mat preview_mat)
 
 void MeasureWidget::ConnectEventListeners() {
 	connect(select_valve_image_.get(), &QPushButton::clicked, this, [this]() {
-		file_dialog_->show();
+		file_dialog_->exec();
 		});
 
 	connect(preview_btn_.get(), &QPushButton::clicked, this, [this]() {

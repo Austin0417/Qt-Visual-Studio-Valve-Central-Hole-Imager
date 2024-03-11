@@ -161,7 +161,7 @@ public:
         threshold_mode_tooltip_->setText(QString());
         saline_tooltip->setText(QString());
         clear_lines->setText(QCoreApplication::translate("CalibrateWidget", "Clear Gauge Helper Lines", nullptr));
-        crop_image_btn->setText(QCoreApplication::translate("CalibrateWidget", "Crop Image", nullptr));
+        crop_image_btn->setText(QCoreApplication::translate("CalibrateWidget", "Crop Current Image", nullptr));
         clear_image_btn->setText(QCoreApplication::translate("CalibrateWidget", "Clear Image", nullptr));
     } // retranslateUi
 

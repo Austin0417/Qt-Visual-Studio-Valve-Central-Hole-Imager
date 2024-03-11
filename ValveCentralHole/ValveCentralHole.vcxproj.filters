@@ -79,6 +79,12 @@
     <ClCompile Include="CalibrationGaugeLabel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BinaryGaugeLabel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SelectImageCropDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="CalibrateWidget.ui">
@@ -96,6 +102,9 @@
     <QtUic Include="ImageCropDialog.ui">
       <Filter>Form Files</Filter>
     </QtUic>
+    <QtUic Include="SelectImageCropDialog.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="CalibrateWidget.h">
@@ -111,6 +120,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="CalibrationGaugeLabel.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="SelectImageCropDialog.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
@@ -137,6 +149,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CameraConfirmLabel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BinaryGaugeLabel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
