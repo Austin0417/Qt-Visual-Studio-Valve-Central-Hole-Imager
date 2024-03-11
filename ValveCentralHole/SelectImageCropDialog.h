@@ -5,6 +5,7 @@
 #include <QCheckBox>
 #include "CameraConfirmLabel.h"
 #include <QLineEdit>
+#include <QFileDialog>
 #include <QPushButton>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
@@ -21,11 +22,16 @@ class SelectImageCropDialog : public QDialog
 	Q_OBJECT
 private:
 	QString image_file_name_;
+	QString latest_directory_entered_;
 	std::unique_ptr<CameraConfirmLabel> image_label_;
 	std::unique_ptr<QCheckBox> save_as_new_file_checkbox_;
 	std::unique_ptr<QLineEdit> new_image_file_name_;
+	std::unique_ptr<QPushButton> reselect_image_btn_;
 	std::unique_ptr<QPushButton> confirm_btn_;
 	std::unique_ptr<QPushButton> reset_btn_;
+
+	bool is_reselecting_image_ = false;
+	std::unique_ptr<QFileDialog> file_dialog_;
 
 	std::mutex mutex_;
 	std::condition_variable cv_;
