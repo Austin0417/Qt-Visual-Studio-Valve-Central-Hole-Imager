@@ -322,7 +322,7 @@
     <string notr="true">background: white;</string>
    </property>
    <property name="text">
-    <string>Crop Image</string>
+    <string>Crop Current Image</string>
    </property>
   </widget>
   <widget class="QPushButton" name="clear_image_btn">

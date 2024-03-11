@@ -63,14 +63,6 @@ static void CreateBinaryImagePreview(CalibrateWidget& calibrate_widget, const Ma
 
 }
 
-static void CalibrationGaugeLabelCallback(const QPoint& start, const QPoint& end)
-{
-	// Calculate the line length
-	qDebug() << "Drawn line length: " << std::abs(end.x() - start.x());
-
-	// TODO Display the length of the drawn lines in pixels to the user, and implement a "mirror" feature that will draw the line in the binary image as well
-}
-
 QString GetUnitSuffix(UnitSelection unit_selection_)
 {
 	QString result;
@@ -97,8 +89,8 @@ CalibrateWidget::CalibrateWidget(const std::unique_ptr<bool>& gauge_helper_flag,
 
 	// Initialize thread pool with 3 threads, which will be used for updating the binary preview image
 	tp_.setNumThreads(3);
-	CheckForLastCalibrationParameters();
 	InitializeUIElements();
+	CheckForLastCalibrationParameters();
 	ConnectEventListeners();
 }
 
@@ -146,6 +138,11 @@ void CalibrateWidget::ReceiveAndDisplayCameraImage(const QString& image_name)
 	DisplaySelectedImage(image_name, true);
 }
 
+void CalibrateWidget::SetMainCallback(const std::function<void(bool)>& callback)
+{
+	main_callback_ = callback;
+}
+
 double CalibrateWidget::GetGaugeDiameter() {
 	return gauge_diameter_;
 }
@@ -176,7 +173,7 @@ void CalibrateWidget::DisplaySelectedImage(const QString& filename, bool should_
 
 	if (should_show_binary_immediately)
 	{
-		isCurrentlyShowingPreview = true;
+		SetIsCurrentlyShowingPreview(true);
 	}
 
 	// Binarize the selected image on a separate thread to have it ready for preview
@@ -197,7 +194,7 @@ void CalibrateWidget::DisplaySelectedImage(Mat selected_mat, bool should_show_bi
 
 	if (should_show_binary_immediately)
 	{
-		isCurrentlyShowingPreview = true;
+		SetIsCurrentlyShowingPreview(true);
 	}
 
 	auto thread_handle = std::async(std::launch::async, &CreateBinaryImagePreview,
@@ -249,7 +246,7 @@ void CalibrateWidget::InitializeUIElements()
 	clear_image_btn_.reset(ui->clear_image_btn);
 
 	original_image_ = std::make_unique<CalibrationGaugeLabel>(gauge_helper_flag_, this);
-	binarized_image_ = std::make_unique<CalibrationGaugeLabel>(gauge_helper_flag_, this);
+	binarized_image_ = std::make_unique<BinaryGaugeLabel>(gauge_helper_flag_, this);
 	original_image_->setFixedWidth(IMAGE_WIDTH);
 	original_image_->setFixedHeight(IMAGE_HEIGHT);
 	binarized_image_->setFixedWidth(IMAGE_WIDTH);
@@ -258,9 +255,18 @@ void CalibrateWidget::InitializeUIElements()
 	binarized_image_->move(640, 220);
 	original_image_->setStyleSheet("background: brown;");
 	binarized_image_->setStyleSheet("background: brown;");
-	original_image_->SetOnMouseReleaseCallback(&CalibrationGaugeLabelCallback);
-	binarized_image_->SetOnMouseReleaseCallback(&CalibrationGaugeLabelCallback);
+	binarized_image_->SetCanDraw(false);
+	binarized_image_->SetShouldClearOnRepaint(false);
 
+	// This function is called by the CalibrationGaugeLabel that holds the original image, when the user draws a line in the original image
+	// In this function, we will take the end points of the line that was drawn, and send them to the CalibrationGaugeLabel that holds the binary preview image
+	original_image_->SetOnMouseReleaseCallback([this](const QPoint& start, const QPoint& end)
+		{
+			start_ = start;
+			end_ = end;
+			binarized_image_->SetLineStartPoint(start_);
+			binarized_image_->SetLineEndPoint(end_);
+		});
 
 	clear_lines_btn_->setVisible(false);
 
@@ -319,6 +325,9 @@ void CalibrateWidget::CheckForLastCalibrationParameters()
 		gauge_diameter_ = gauge_parameters_.GetGaugeDiameter();
 		threshold_value_ = gauge_parameters_.GetThresholdValue();
 		selected_image_filename_ = gauge_parameters_.GetImageFileName();
+
+		// Update the widgets to reflect this data here
+		RefreshWidgetsWithDatabase(gauge_parameters_);
 	}
 }
 
@@ -412,7 +421,7 @@ void CalibrateWidget::ConnectEventListeners()
 		});
 
 	connect(select_file_button_.get(), &QPushButton::clicked, this, [this]() {
-		file_select_->show();
+		file_select_->exec();
 		});
 
 	connect(file_select_.get(), &QFileDialog::fileSelected, this, [this](const QString& file) {
@@ -428,7 +437,7 @@ void CalibrateWidget::ConnectEventListeners()
 
 	// When the preview button is pressed, we only want to binarize the input image for previewing (don't perform any calibration work yet)
 	connect(preview_btn_.get(), &QPushButton::clicked, this, [this]() {
-		isCurrentlyShowingPreview = true;
+		SetIsCurrentlyShowingPreview(true);
 		DisplayPreviewMat();
 		});
 
@@ -497,16 +506,27 @@ void CalibrateWidget::ConnectEventListeners()
 	connect(clear_image_btn_.get(), &QPushButton::clicked, this, [this]()
 		{
 			// Clear the current mat and binarized mat variables, and clear the pixmaps for the labels as well
+			ClearGaugeLines();
 			current_image_mat_ = Mat();
 			binarized_preview_image_mat_ = Mat();
 			original_image_->setPixmap(QPixmap());
 			binarized_image_->setPixmap(QPixmap());
+			SetIsCurrentlyShowingPreview(false);
 		});
 
 	connect(this, &CalibrateWidget::ShouldClearHelperGaugeLines, this, [this]()
 		{
-			original_image_->ClearDrawnLines();
-			binarized_image_->ClearDrawnLines();
+			ClearGaugeLines();
+		});
+
+	connect(this, &CalibrateWidget::MirrorDrawnLinesToPreview, this, [this]()
+		{
+			if (!start_.isNull() && !end_.isNull())
+			{
+				binarized_image_->SetLineStartPoint(start_);
+				binarized_image_->SetLineEndPoint(end_);
+			}
+			binarized_image_->PaintEventUpdate();
 		});
 }
 
@@ -523,4 +543,60 @@ void CalibrateWidget::SaveCurrentParametersToDatabase()
 					}
 				});
 		});
+}
+
+void CalibrateWidget::SetIsCurrentlyShowingPreview(bool status)
+{
+	isCurrentlyShowingPreview = status;
+	if (main_callback_)
+	{
+		main_callback_(isCurrentlyShowingPreview);
+	}
+}
+
+void CalibrateWidget::ClearGaugeLines()
+{
+	original_image_->ClearDrawnLines();
+	binarized_image_->ClearDrawnLines();
+	start_ = QPoint();
+	end_ = QPoint();
+	binarized_image_->SetLineStartPoint(QPoint());
+	binarized_image_->SetLineEndPoint(QPoint());
+}
+
+void CalibrateWidget::RefreshWidgetsWithDatabase(const CalibrationGaugeParameters& parameters)
+{
+	diameter_input_->setValue(parameters.GetGaugeDiameter());
+
+	switch (parameters.GetUnitSelection())
+	{
+	case UnitSelection::MILLIMETERS:
+	{
+		diameter_unit_selection_->setCurrentIndex(0);
+		break;
+	}
+	case UnitSelection::INCHES:
+	{
+		diameter_unit_selection_->setCurrentIndex(1);
+		break;
+	}
+	}
+
+	threshold_input_slider_->setValue(parameters.GetThresholdValue());
+
+	switch (parameters.GetThresholdMode())
+	{
+	case ThresholdMode::STANDARD:
+	{
+		threshold_mode_combo_box_->setCurrentIndex(0);
+		break;
+	}
+	case ThresholdMode::INVERTED:
+	{
+		threshold_mode_combo_box_->setCurrentIndex(1);
+		break;
+	}
+	}
+
+	DisplaySelectedImage(parameters.GetImageFileName());
 }

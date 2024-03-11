@@ -5,8 +5,7 @@
 #include "ui_CalibrateWidget.h"
 #include "ThreadPool.h"
 #include "ImageCropDialog.h"
-#include "CalibrationGaugeLabel.h"
-#include <QObject>
+#include "BinaryGaugeLabel.h"
 #include <QComboBox>
 #include <QString>
 #include <QWidget>
@@ -14,21 +13,14 @@
 #include <QFileDialog>
 #include <QDoubleSpinBox>
 #include <QVBoxLayout>
-#include <QPainter>
-#include <QPen>
-#include <QBrush>
 #include <QLabel>
 #include <QSlider>
 #include <QMouseEvent>
 #include <opencv2/core.hpp>
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/imgproc.hpp>
-#include <opencv2/videoio.hpp>
+#include <functional>
 #include <future>
 #include <memory>
 #include <mutex>
-#include <vector>
 
 
 constexpr int IMAGE_WIDTH = 610;
@@ -42,7 +34,6 @@ namespace Ui {
 }
 
 QT_END_NAMESPACE
-
 
 
 QString GetUnitSuffix(UnitSelection current_unit_selection);
@@ -60,6 +51,7 @@ public:
 	void ApplyLastSavedParameters();
 	void ReceiveAndDisplayCameraImage(Mat mat_from_camera);
 	void ReceiveAndDisplayCameraImage(const QString& image_name);
+	void SetMainCallback(const std::function<void(bool)>& callback);
 
 	static UnitSelection current_unit_selection_;
 
@@ -67,6 +59,7 @@ signals:
 	void UpdatePreviewMat();
 	void OnCalibrationComplete(double calibration_factor);
 	void ShouldClearHelperGaugeLines();
+	void MirrorDrawnLinesToPreview();
 
 private:
 	Ui::CalibrateWidget* ui;
@@ -74,9 +67,13 @@ private:
 	Mat current_image_mat_;
 	Mat binarized_preview_image_mat_;
 
+	std::function<void(bool)> main_callback_;
+
+	// Mutex and thread pool for better and faster image processing
 	std::mutex mutex_;
 	ThreadPool tp_;
 
+	// Calibration Gauge Variables
 	CalibrationGaugeParameters gauge_parameters_;
 	static double gauge_diameter_;
 	int threshold_value_ = 127;
@@ -84,12 +81,11 @@ private:
 	QString selected_image_filename_;
 	bool isCurrentlyShowingPreview = false;
 
-	std::vector<std::pair<QPointF, QPointF>> line_points_;
-	std::pair<QPointF, QPointF> current_line_point_pair_;
-	bool is_on_line_start_ = true;
-	QPointF start_line_;
-	QPointF end_line_;
+	// Start and End Points for the drawn line in the original input image, if there is a line
+	QPoint start_;
+	QPoint end_;
 
+	// UI Elements
 	std::unique_ptr<QDoubleSpinBox> diameter_input_;
 	std::unique_ptr<QComboBox> diameter_unit_selection_;
 	std::unique_ptr<QSlider> threshold_input_slider_;
@@ -100,7 +96,7 @@ private:
 	std::unique_ptr<QPushButton> select_file_button_;
 	std::unique_ptr<QVBoxLayout> widget_layout_;
 	std::unique_ptr<CalibrationGaugeLabel> original_image_;
-	std::unique_ptr<CalibrationGaugeLabel> binarized_image_;
+	std::unique_ptr<BinaryGaugeLabel> binarized_image_;
 	std::unique_ptr<QPushButton> preview_btn_;
 	std::unique_ptr<QPushButton> calibrate_btn_;
 	std::unique_ptr<QLabel> calibration_factor_label_;
@@ -118,5 +114,8 @@ private:
 	void DisplayPreviewMat();
 	void DisplayCalibrationFactor();
 	void SaveCurrentParametersToDatabase();
+	void SetIsCurrentlyShowingPreview(bool status);
+	void ClearGaugeLines();
+	void RefreshWidgetsWithDatabase(const CalibrationGaugeParameters& parameters);
 };
 

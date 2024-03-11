@@ -1,5 +1,6 @@
 #include "ValveCentralHole.h"
 #include "CameraDisplayDialog.h"
+#include "MessageBoxHelper.h"
 
 
 void ValveCentralHole::InitializeUIElements() {
@@ -8,8 +9,12 @@ void ValveCentralHole::InitializeUIElements() {
 	menu_bar_.reset(ui.options_menu);
 	calibrate_tab_ = std::make_unique<CalibrateWidget>(is_gauge_helper_tool_active_, this);
 	measure_tab_ = std::make_unique<MeasureWidget>(this);
+	file_dialog_ = std::make_unique<QFileDialog>(this);
+
+	file_dialog_->setStyleSheet("background: white;");
 
 	options_menu_.reset(menu_bar_->addMenu("Options"));
+	options_menu_->addAction(new QAction("Crop an Image"));
 	helper_tool_submenu_ = new QMenu("Helper Gauge Diameter Measure Tool");
 	options_menu_->addMenu(helper_tool_submenu_);
 
@@ -24,6 +29,11 @@ void ValveCentralHole::InitializeUIElements() {
 
 	// Removing the starting tabs from the QTabWidget
 	tab_widget->clear();
+
+	calibrate_tab_->SetMainCallback([this, mirror_action](bool isCurrentlyShowingPreview)
+		{
+			mirror_action->setEnabled(isCurrentlyShowingPreview);
+		});
 
 	tab_widget->addTab(calibrate_tab_.get(), "Calibrate");
 	tab_widget->addTab(measure_tab_.get(), "Measure");
@@ -43,6 +53,17 @@ void ValveCentralHole::ConnectEventListeners() {
 		{
 			measure_tab_->RefreshCalibrationFactor();
 		}
+		});
+
+	connect(file_dialog_.get(), &QFileDialog::fileSelected, this, [this](const QString& filename)
+		{
+			if (!filename.contains(".jpg") && !filename.contains(".png"))
+			{
+				MessageBoxHelper::ShowErrorDialog("Selected file was not in a valid image format (jpg or png)");
+				return;
+			}
+			SelectImageCropDialog* dialog = new SelectImageCropDialog(filename, this);
+			dialog->exec();
 		});
 
 	QList<QAction*> options_menu_actions = options_menu_->actions();
@@ -71,6 +92,13 @@ void ValveCentralHole::ConnectEventListeners() {
 						camera_dialog->show();
 					});
 			}
+			else if (action->text() == "Crop an Image")
+			{
+				connect(action, &QAction::triggered, this, [this]()
+					{
+						file_dialog_->exec();
+					});
+			}
 		}
 	}
 
@@ -94,12 +122,19 @@ void ValveCentralHole::ConnectEventListeners() {
 						}
 					});
 			}
-			else
+			else if (action->text() == "Clear Gauge Helper Lines")
 			{
 				connect(action, &QAction::triggered, this, [this]()
 					{
 						// TODO Clear gauge helper lines here
 						emit calibrate_tab_->ShouldClearHelperGaugeLines();
+					});
+			}
+			else
+			{
+				connect(action, &QAction::triggered, this, [this]()
+					{
+						emit calibrate_tab_->MirrorDrawnLinesToPreview();
 					});
 			}
 		}
