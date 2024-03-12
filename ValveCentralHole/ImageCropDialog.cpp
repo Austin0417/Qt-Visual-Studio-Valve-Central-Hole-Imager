@@ -4,24 +4,13 @@
 
 
 
-QString ImageCropDialog::temp_image_filename = "temp_image.jpg";
-
 
 // TODO Apply the new crop translation technique
-ImageCropDialog::ImageCropDialog(Mat input_image, QWidget* parent) : input_image_(input_image), QDialog(parent)
+ImageCropDialog::ImageCropDialog(QString image_file_name, QWidget* parent) : image_file_name_(image_file_name), QDialog(parent)
 {
 	ui.setupUi(this);
 
-	// Resize the input Mat dimensions so that it fits with LABEL_WIDTH and LABEL_HEIGHT
-	// Determine whether the image will be shrunk, or enlarged
-
-	auto thread_one = std::async(std::launch::async, [this]()
-		{
-			Mat temp = input_image_.clone();
-			cv::resize(temp, temp, Size(LABEL_WIDTH, LABEL_HEIGHT));
-			emit this->CanSetPixmap(temp);
-		});
-
+	input_image_ = imread(image_file_name_.toStdString());
 
 	input_image_label_ = std::make_unique<CameraConfirmLabel>(is_crop_enabled, this);
 	input_image_label_->setFixedWidth(LABEL_WIDTH);
@@ -51,10 +40,12 @@ ImageCropDialog::ImageCropDialog(Mat input_image, QWidget* parent) : input_image
 
 	connect(this, &ImageCropDialog::CanSetPixmap, this, [this](const Mat& mat)
 		{
-			QImage image(mat.data, mat.cols, mat.rows, mat.step, QImage::Format::Format_Grayscale8);
+			QImage image(mat.data, mat.cols, mat.rows, mat.step, QImage::Format::Format_BGR888);
 			QPixmap pixmap = QPixmap::fromImage(image).scaled(LABEL_WIDTH, LABEL_HEIGHT);
 			input_image_label_->setPixmap(pixmap);
 		});
+
+	emit this->CanSetPixmap(input_image_);
 }
 
 

@@ -23,20 +23,16 @@ class ImageCropDialog : public QDialog
 private:
 	std::unique_ptr<CameraConfirmLabel> input_image_label_;
 	std::unique_ptr<QPushButton> ok_btn_;
+	QString image_file_name_;
 	Mat input_image_;
 	Mat cropped_;
 	bool is_crop_enabled = true;
-	QRect current_cropped_region;
 	std::function<void(const Mat& mat)> confirm_callback_;
-	bool isImageReadyToBeDisplayed = false;
-	std::mutex mutex_;
-	std::condition_variable cv_;
 
 	Ui::ImageCropDialog ui;
 
-	static QString temp_image_filename;
 public:
-	ImageCropDialog(Mat input_image, QWidget* parent = nullptr);
+	ImageCropDialog(QString image_filename, QWidget* parent = nullptr);
 	void SetConfirmCallback(const std::function<void(const Mat& mat)>& callback);
 
 signals:

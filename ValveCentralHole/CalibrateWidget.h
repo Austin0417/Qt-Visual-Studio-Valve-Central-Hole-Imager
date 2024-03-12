@@ -110,7 +110,7 @@ private:
 	void CheckForLastCalibrationParameters();
 	void ConnectEventListeners();
 	void DisplaySelectedImage(const QString& filename, bool should_show_binary_immediately = false);
-	void DisplaySelectedImage(const Mat& selected_mat, bool should_show_binary_immediately = false);
+	void DisplaySelectedImage(const Mat& selected_mat, const QImage::Format& image_format, bool should_show_binary_immediately = false);
 	void DisplayPreviewMat();
 	void DisplayCalibrationFactor();
 	void SaveCurrentParametersToDatabase();

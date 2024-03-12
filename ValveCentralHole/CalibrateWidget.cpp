@@ -130,7 +130,7 @@ void CalibrateWidget::ReceiveAndDisplayCameraImage(Mat mat_from_camera)
 
 	current_image_mat_ = mat_from_camera;
 	imshow("Result Image", current_image_mat_);
-	DisplaySelectedImage(current_image_mat_, true);
+	DisplaySelectedImage(current_image_mat_, QImage::Format::Format_Grayscale8, true);
 }
 
 void CalibrateWidget::ReceiveAndDisplayCameraImage(const QString& image_name)
@@ -181,7 +181,7 @@ void CalibrateWidget::DisplaySelectedImage(const QString& filename, bool should_
 		std::ref(*this), std::ref(current_image_mat_), threshold_value_, threshold_mode_combo_box_->currentIndex(), should_show_binary_immediately, std::ref(mutex_));
 }
 
-void CalibrateWidget::DisplaySelectedImage(const Mat& selected_mat, bool should_show_binary_immediately)
+void CalibrateWidget::DisplaySelectedImage(const Mat& selected_mat, const QImage::Format& image_format, bool should_show_binary_immediately)
 {
 	if (current_image_mat_.empty())
 	{
@@ -189,8 +189,19 @@ void CalibrateWidget::DisplaySelectedImage(const Mat& selected_mat, bool should_
 		return;
 	}
 	current_image_mat_ = selected_mat.clone();
-	QImage image(current_image_mat_.data, current_image_mat_.cols, current_image_mat_.rows, current_image_mat_.step, QImage::Format_Grayscale8);
+	QImage image(current_image_mat_.data, current_image_mat_.cols, current_image_mat_.rows, current_image_mat_.step, image_format);
 	original_image_->setPixmap(QPixmap::fromImage(image).scaled(IMAGE_WIDTH, IMAGE_HEIGHT));
+
+	// Now we can grayscale the input mat if it isn't already in grayscale
+	switch (image_format)
+	{
+	case QImage::Format::Format_BGR888:
+	{
+		cv::cvtColor(current_image_mat_, current_image_mat_, COLOR_BGR2GRAY);
+		break;
+	}
+	}
+
 
 	if (should_show_binary_immediately)
 	{
@@ -494,10 +505,10 @@ void CalibrateWidget::ConnectEventListeners()
 				MessageBoxHelper::ShowErrorDialog("An input image must be selected before cropping");
 				return;
 			}
-			ImageCropDialog* crop_dialog = new ImageCropDialog(current_image_mat_.clone(), this);
+			ImageCropDialog* crop_dialog = new ImageCropDialog(selected_image_filename_, this);
 			crop_dialog->SetConfirmCallback([this](const Mat& cropped)
 				{
-					DisplaySelectedImage(cropped);
+					DisplaySelectedImage(cropped, QImage::Format::Format_BGR888);
 					//current_image_mat_ = current_image_mat_(Rect(cropped_region.x(), cropped_region.y(), cropped_region.width(), cropped_region.height()));
 				});
 			crop_dialog->exec();
