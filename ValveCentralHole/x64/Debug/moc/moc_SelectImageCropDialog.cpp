@@ -113,7 +113,7 @@ Q_CONSTINIT const QMetaObject SelectImageCropDialog::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<SelectImageCropDialog, std::true_type>,
         // method 'IsReadyToDisplayPixmap'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        QtPrivate::TypeAndForceComplete<Mat, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const Mat &, std::false_type>,
         // method 'ShouldCloseDialog'
         QtPrivate::TypeAndForceComplete<void, std::false_type>
     >,
@@ -133,7 +133,7 @@ void SelectImageCropDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
-            using _t = void (SelectImageCropDialog::*)(Mat );
+            using _t = void (SelectImageCropDialog::*)(const Mat & );
             if (_t _q_method = &SelectImageCropDialog::IsReadyToDisplayPixmap; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
                 *result = 0;
                 return;
@@ -180,7 +180,7 @@ int SelectImageCropDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void SelectImageCropDialog::IsReadyToDisplayPixmap(Mat _t1)
+void SelectImageCropDialog::IsReadyToDisplayPixmap(const Mat & _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);

@@ -181,15 +181,15 @@ void CalibrateWidget::DisplaySelectedImage(const QString& filename, bool should_
 		std::ref(*this), std::ref(current_image_mat_), threshold_value_, threshold_mode_combo_box_->currentIndex(), should_show_binary_immediately, std::ref(mutex_));
 }
 
-void CalibrateWidget::DisplaySelectedImage(Mat selected_mat, bool should_show_binary_immediately)
+void CalibrateWidget::DisplaySelectedImage(const Mat& selected_mat, bool should_show_binary_immediately)
 {
 	if (current_image_mat_.empty())
 	{
 		MessageBoxHelper::ShowErrorDialog("An error occurred while attempting to display the image file");
 		return;
 	}
-
-	QImage image(current_image_mat_.data, current_image_mat_.cols, current_image_mat_.rows, QImage::Format_Grayscale8);
+	current_image_mat_ = selected_mat.clone();
+	QImage image(current_image_mat_.data, current_image_mat_.cols, current_image_mat_.rows, current_image_mat_.step, QImage::Format_Grayscale8);
 	original_image_->setPixmap(QPixmap::fromImage(image).scaled(IMAGE_WIDTH, IMAGE_HEIGHT));
 
 	if (should_show_binary_immediately)
@@ -210,7 +210,7 @@ void CalibrateWidget::DisplayPreviewMat()
 		return;
 	}
 
-	QImage preview_image(binarized_preview_image_mat_.data, binarized_preview_image_mat_.cols, binarized_preview_image_mat_.rows, QImage::Format_Grayscale8);
+	QImage preview_image(binarized_preview_image_mat_.data, binarized_preview_image_mat_.cols, binarized_preview_image_mat_.rows, binarized_preview_image_mat_.step, QImage::Format_Grayscale8);
 	if (preview_image.isNull())
 	{
 		qDebug() << "Error converting binary image into QImage object";
@@ -495,9 +495,9 @@ void CalibrateWidget::ConnectEventListeners()
 				return;
 			}
 			ImageCropDialog* crop_dialog = new ImageCropDialog(current_image_mat_.clone(), this);
-			crop_dialog->SetConfirmCallback([this](const QString& cropped_image_file_name)
+			crop_dialog->SetConfirmCallback([this](const Mat& cropped)
 				{
-					DisplaySelectedImage(cropped_image_file_name);
+					DisplaySelectedImage(cropped);
 					//current_image_mat_ = current_image_mat_(Rect(cropped_region.x(), cropped_region.y(), cropped_region.width(), cropped_region.height()));
 				});
 			crop_dialog->exec();

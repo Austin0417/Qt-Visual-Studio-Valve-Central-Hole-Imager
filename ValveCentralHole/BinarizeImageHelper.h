@@ -33,4 +33,5 @@ public:
 	static double CalculateValveArea(unsigned long long number_on_pixels, double calibration_factor);
 	static void InvertBinaryImage(Mat& mat);
 	static double ApplySalineTransformation(double calibration_factor);
+	static void ApplyImageCroppingFromQLabel(const Mat& input, Mat& cropped_output, int crop_x, int crop_y, int crop_width, int crop_height, int label_width, int label_height);
 };

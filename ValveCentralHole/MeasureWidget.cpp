@@ -15,7 +15,6 @@ static void CreateBinaryImagePreview(MeasureWidget& measure_widget, const Mat& m
 }
 
 
-
 MeasureWidget::MeasureWidget(QWidget* parent)
 	: QWidget(parent)
 	, ui(new Ui::MeasureWidget)
@@ -48,21 +47,9 @@ void MeasureWidget::DisplayPreviewMat()
 		return;
 	}
 
-	QImage preview_image(binarized_image_preview_mat_.data, binarized_image_preview_mat_.cols, binarized_image_preview_mat_.rows, QImage::Format_Grayscale8);
-	if (preview_image.isNull())
-	{
-		MessageBoxHelper::ShowErrorDialog("An error occurred while trying to display the preview image");
-		return;
-	}
-
-	QPixmap preview_pixmap = QPixmap::fromImage(preview_image);
-	if (preview_pixmap.isNull())
-	{
-		MessageBoxHelper::ShowErrorDialog("An error occurred while trying to display the preview image");
-		return;
-	}
-
-	binarized_image_->setPixmap(preview_pixmap.scaled(QSize(IMAGE_WIDTH, IMAGE_HEIGHT)));
+	QImage image(binarized_image_preview_mat_.data, binarized_image_preview_mat_.cols, binarized_image_preview_mat_.rows, binarized_image_preview_mat_.step, QImage::Format_Grayscale8);
+	QPixmap pixmap = QPixmap::fromImage(image, Qt::ImageConversionFlag::MonoOnly);
+	binarized_image_->setPixmap(pixmap.scaled(binarized_image_->width(), binarized_image_->height()));
 }
 
 
@@ -151,6 +138,11 @@ void MeasureWidget::ConnectEventListeners() {
 	connect(this, &MeasureWidget::UpdatePreviewMat, this, [this]()
 		{
 			DisplayPreviewMat();
+		});
+
+	connect(this, &MeasureWidget::OnPreviewMatResizeComplete, this, [this](const Mat& resized)
+		{
+
 		});
 }
 

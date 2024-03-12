@@ -25,6 +25,7 @@ public:
 
 signals:
 	void UpdatePreviewMat();
+	void OnPreviewMatResizeComplete(const Mat& resized);
 	void onAreaCalculationComplete(double valve_area);
 
 private:

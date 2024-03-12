@@ -1,5 +1,6 @@
 #include "SelectImageCropDialog.h"
 #include "MessageBoxHelper.h"
+#include "BinarizeImageHelper.h"
 
 // Resizes the mat before saving the new cropped image
 static void ThreadWorkOnConfirmClick(Mat& mat, int width, int height, const std::function<void()>& on_complete)
@@ -31,6 +32,7 @@ SelectImageCropDialog::SelectImageCropDialog(QString file, QWidget* parent) : im
 void SelectImageCropDialog::InitializeUIElements(QScreen* screen)
 {
 	reselect_image_btn_ = std::make_unique<QPushButton>(this);
+	reselect_image_btn_->setText("Select Another Image");
 
 	image_label_ = std::make_unique<CameraConfirmLabel>(crop, this);
 	image_label_->setFixedWidth(screen->size().width() * 0.70);
@@ -39,7 +41,7 @@ void SelectImageCropDialog::InitializeUIElements(QScreen* screen)
 	image_label_->setStyleSheet("background: black;");
 	image_label_->SetCropCallback([this](int x, int y, int width, int height)
 		{
-			is_resizing_complete_ = false;
+			is_crop_translation_complete_ = false;
 			SetPixmapForLabel(mat_, x, y, std::abs(width), std::abs(height));
 		});
 
@@ -54,7 +56,7 @@ void SelectImageCropDialog::InitializeUIElements(QScreen* screen)
 	new_image_file_name_ = std::make_unique<QLineEdit>(this);
 	new_image_file_name_->setPlaceholderText("New Image File Name...");
 	new_image_file_name_->setVisible(false);
-	new_image_file_name_->move(save_as_new_file_checkbox_->pos().x() + 20, save_as_new_file_checkbox_->pos().y() + 25);
+	new_image_file_name_->move(save_as_new_file_checkbox_->pos().x() + 20, save_as_new_file_checkbox_->pos().y() + 30);
 
 	reset_btn_ = std::make_unique<QPushButton>("Reset Image to Default", this);
 	reset_btn_->move(checkbox_caption->x(), image_label_->pos().y() + image_label_->height() + 15);
@@ -62,6 +64,17 @@ void SelectImageCropDialog::InitializeUIElements(QScreen* screen)
 	confirm_btn_ = std::make_unique<QPushButton>("Confirm", this);
 	confirm_btn_->move((image_label_->x() + image_label_->width()) - confirm_btn_->width(), reset_btn_->y());
 	confirm_btn_->setEnabled(false);
+
+	image_file_extension_ = std::make_unique<QButtonGroup>(this);
+	jpg_btn_ = std::make_unique<QRadioButton>(".jpg", this);
+	png_btn_ = std::make_unique<QRadioButton>(".png", this);
+	image_file_extension_->addButton(jpg_btn_.get());
+	image_file_extension_->addButton(png_btn_.get());
+	image_file_extension_->setExclusive(true);
+	jpg_btn_->move(checkbox_caption->x() + checkbox_caption->width() + 50, new_image_file_name_->y());
+	png_btn_->move(checkbox_caption->x() + checkbox_caption->width() + 50, new_image_file_name_->y() + 20);
+	jpg_btn_->setVisible(false);
+	png_btn_->setVisible(false);
 
 	file_dialog_ = std::make_unique<QFileDialog>(this);
 	file_dialog_->setFileMode(QFileDialog::Directory);
@@ -84,17 +97,21 @@ void SelectImageCropDialog::ConnectEventListeners()
 			case Qt::Unchecked:
 			{
 				new_image_file_name_->setVisible(false);
+				jpg_btn_->setVisible(false);
+				png_btn_->setVisible(false);
 				break;
 			}
 			case Qt::Checked:
 			{
 				new_image_file_name_->setVisible(true);
+				jpg_btn_->setVisible(true);
+				png_btn_->setVisible(true);
 				break;
 			}
 			}
 		});
 
-	connect(this, &SelectImageCropDialog::IsReadyToDisplayPixmap, this, [this](Mat mat)
+	connect(this, &SelectImageCropDialog::IsReadyToDisplayPixmap, this, [this](const Mat& mat)
 		{
 			if (mat.empty())
 			{
@@ -105,8 +122,9 @@ void SelectImageCropDialog::ConnectEventListeners()
 			}
 
 			QImage image(mat.data, mat.cols, mat.rows, QImage::Format::Format_BGR888);
-			QPixmap pixmap = QPixmap::fromImage(image);
-			image_label_->setPixmap(pixmap.scaled(image_label_->width(), image_label_->height()));
+			QPixmap pixmap = QPixmap::fromImage(image).scaled(image_label_->width(), image_label_->height());
+			image_label_->setPixmap(pixmap);
+			image_label_->SetNewOriginalPixmap(pixmap);
 			confirm_btn_->setEnabled(true);
 		});
 
@@ -114,12 +132,14 @@ void SelectImageCropDialog::ConnectEventListeners()
 		{
 			if (save_as_new_file_checkbox_->isChecked())
 			{
-				if (new_image_file_name_->text().isEmpty())
+				if (new_image_file_name_->text().isEmpty() || (!jpg_btn_->isChecked() && !png_btn_->isChecked()))
 				{
-					MessageBoxHelper::ShowErrorDialog("File name cannot be empty!");
+					MessageBoxHelper::ShowErrorDialog("File name cannot be empty, or a file extension was not chosen!");
 					return;
 				}
+
 				file_dialog_->setFileMode(QFileDialog::Directory);
+				is_reselecting_image_ = false;
 				file_dialog_->exec();
 			}
 			else
@@ -136,15 +156,28 @@ void SelectImageCropDialog::ConnectEventListeners()
 
 	connect(file_dialog_.get(), &QFileDialog::fileSelected, this, [this](const QString& file)
 		{
-			// Directory select
+			// Directory select (confirming image save as new)
 			if (!is_reselecting_image_)
 			{
 				qDebug() << "Selected directory: " << file;
 				latest_directory_entered_ = file;
-				if (imwrite((latest_directory_entered_ + "/" + new_image_file_name_->text()).toStdString(), cropped_))
+
+				if (new_image_file_name_->text().contains(".jpg") || new_image_file_name_->text().contains(".png"))
 				{
-					this->close();
-					return;
+					if (imwrite((latest_directory_entered_ + "/" + new_image_file_name_->text()).toStdString(), cropped_))
+					{
+						this->close();
+						return;
+					}
+				}
+				else
+				{
+					QString file_extension = jpg_btn_->isChecked() ? ".jpg" : ".png";
+					if (imwrite((latest_directory_entered_ + "/" + new_image_file_name_->text() + file_extension).toStdString(), cropped_))
+					{
+						this->close();
+						return;
+					}
 				}
 				MessageBoxHelper::ShowErrorDialog("An error occurred while trying to save the cropped image!");
 			}
@@ -158,8 +191,8 @@ void SelectImageCropDialog::ConnectEventListeners()
 				}
 
 				// Set the new pixmap and cv::Mat
-				image_label_->setPixmap(QPixmap(file).scaled(image_label_->width(), image_label_->height()));
-				
+				image_file_name_ = file;
+				SetPixmapForLabel();
 			}
 
 		});
@@ -173,51 +206,32 @@ void SelectImageCropDialog::ConnectEventListeners()
 
 void SelectImageCropDialog::SetPixmapForLabel()
 {
-	// Open the image file with the selected name
-	auto thread_one = std::async(std::launch::async, [this]()
-		{
-			{
-				std::unique_lock<std::mutex> lock(mutex_);
-				cv_.wait(lock, [this]()
-					{
-						return is_resizing_complete_;
-					});
-			}
-			emit this->IsReadyToDisplayPixmap(Mat());
-		});
-
-	// Also initialize the cv Mat object from the filename as well (resize it to match the dimensions of the QLabel)
-	auto thread_two = std::async(std::launch::async, [this]()
-		{
-			mat_ = imread(image_file_name_.toStdString());
-			cv::resize(mat_, mat_, Size(image_label_->width(), image_label_->height()));
-			is_resizing_complete_ = true;
-			cv_.notify_one();
-		});
+	if (image_file_name_.isEmpty())
+	{
+		return;
+	}
+	mat_ = imread(image_file_name_.toStdString());
+	emit this->IsReadyToDisplayPixmap(mat_);
 }
 
 void SelectImageCropDialog::SetPixmapForLabel(Mat mat, int x, int y, int width, int height)
 {
-	// This thread will set cropped_ and perform the resizing
+	// This thread will set cropped_ and perform the cropping translation
 	auto thread_one = std::async(std::launch::async, [this, mat, x, y, width, height]()
 		{
-			if (!mat.empty())
-			{
-				cropped_ = mat(Rect(x, y, width, height));
-				//				cv::resize(cropped_, cropped_, Size(image_label_->width(), image_label_->height()));
-				is_resizing_complete_ = true;
-				cv_.notify_one();
-			}
+			BinarizeImageHelper::ApplyImageCroppingFromQLabel(mat_, cropped_, x, y, width, height, image_label_->width(), image_label_->height());
+			is_crop_translation_complete_ = true;
+			cv_.notify_one();
 		});
 
-	// This thread will emit the signal when the resizing thread has finished
+	// This thread will emit the signal when the cropping thread has finished
 	auto thread_two = std::async(std::launch::async, [this]()
 		{
 			{
 				std::unique_lock<std::mutex> lock(mutex_);
 				cv_.wait(lock, [this]()
 					{
-						return is_resizing_complete_;
+						return is_crop_translation_complete_;
 					});
 			}
 			// After cropped_ has been set, we will create a temp mat of cropped_ that has its dimensions resized to match the dimensions of QLabel

@@ -24,9 +24,10 @@ private:
 	std::unique_ptr<CameraConfirmLabel> input_image_label_;
 	std::unique_ptr<QPushButton> ok_btn_;
 	Mat input_image_;
+	Mat cropped_;
 	bool is_crop_enabled = true;
 	QRect current_cropped_region;
-	std::function<void(const QString&)> confirm_callback_;
+	std::function<void(const Mat& mat)> confirm_callback_;
 	bool isImageReadyToBeDisplayed = false;
 	std::mutex mutex_;
 	std::condition_variable cv_;
@@ -36,9 +37,9 @@ private:
 	static QString temp_image_filename;
 public:
 	ImageCropDialog(Mat input_image, QWidget* parent = nullptr);
-	void SetConfirmCallback(const std::function<void(const QString&)>& callback);
+	void SetConfirmCallback(const std::function<void(const Mat& mat)>& callback);
 
 signals:
-	void CanReadImageFile();
+	void CanSetPixmap(const Mat& mat);
 };
 

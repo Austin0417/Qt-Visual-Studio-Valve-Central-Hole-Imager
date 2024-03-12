@@ -130,3 +130,9 @@ void CameraConfirmLabel::SetShouldApplyYOffset(bool flag)
 {
 	should_apply_y_offset = flag;
 }
+
+
+void CameraConfirmLabel::SetNewOriginalPixmap(const QPixmap& pixmap)
+{
+	original_pixmap_ = pixmap;
+}

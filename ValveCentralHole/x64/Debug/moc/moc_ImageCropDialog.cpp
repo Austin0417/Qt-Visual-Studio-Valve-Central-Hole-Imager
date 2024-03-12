@@ -40,27 +40,35 @@ namespace {
 struct qt_meta_stringdata_CLASSImageCropDialogENDCLASS_t {};
 constexpr auto qt_meta_stringdata_CLASSImageCropDialogENDCLASS = QtMocHelpers::stringData(
     "ImageCropDialog",
-    "CanReadImageFile",
-    ""
+    "CanSetPixmap",
+    "",
+    "Mat",
+    "mat"
 );
 #else  // !QT_MOC_HAS_STRING_DATA
 struct qt_meta_stringdata_CLASSImageCropDialogENDCLASS_t {
-    uint offsetsAndSizes[6];
+    uint offsetsAndSizes[10];
     char stringdata0[16];
-    char stringdata1[17];
+    char stringdata1[13];
     char stringdata2[1];
+    char stringdata3[4];
+    char stringdata4[4];
 };
 #define QT_MOC_LITERAL(ofs, len) \
     uint(sizeof(qt_meta_stringdata_CLASSImageCropDialogENDCLASS_t::offsetsAndSizes) + ofs), len 
 Q_CONSTINIT static const qt_meta_stringdata_CLASSImageCropDialogENDCLASS_t qt_meta_stringdata_CLASSImageCropDialogENDCLASS = {
     {
         QT_MOC_LITERAL(0, 15),  // "ImageCropDialog"
-        QT_MOC_LITERAL(16, 16),  // "CanReadImageFile"
-        QT_MOC_LITERAL(33, 0)   // ""
+        QT_MOC_LITERAL(16, 12),  // "CanSetPixmap"
+        QT_MOC_LITERAL(29, 0),  // ""
+        QT_MOC_LITERAL(30, 3),  // "Mat"
+        QT_MOC_LITERAL(34, 3)   // "mat"
     },
     "ImageCropDialog",
-    "CanReadImageFile",
-    ""
+    "CanSetPixmap",
+    "",
+    "Mat",
+    "mat"
 };
 #undef QT_MOC_LITERAL
 #endif // !QT_MOC_HAS_STRING_DATA
@@ -80,10 +88,10 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSImageCropDialogENDCLASS[] = {
        1,       // signalCount
 
  // signals: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    0,   20,    2, 0x06,    1 /* Public */,
+       1,    1,   20,    2, 0x06,    1 /* Public */,
 
  // signals: parameters
-    QMetaType::Void,
+    QMetaType::Void, 0x80000000 | 3,    4,
 
        0        // eod
 };
@@ -97,8 +105,9 @@ Q_CONSTINIT const QMetaObject ImageCropDialog::staticMetaObject = { {
     qt_incomplete_metaTypeArray<qt_meta_stringdata_CLASSImageCropDialogENDCLASS_t,
         // Q_OBJECT / Q_GADGET
         QtPrivate::TypeAndForceComplete<ImageCropDialog, std::true_type>,
-        // method 'CanReadImageFile'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>
+        // method 'CanSetPixmap'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const Mat &, std::false_type>
     >,
     nullptr
 } };
@@ -109,20 +118,19 @@ void ImageCropDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
         auto *_t = static_cast<ImageCropDialog *>(_o);
         (void)_t;
         switch (_id) {
-        case 0: _t->CanReadImageFile(); break;
+        case 0: _t->CanSetPixmap((*reinterpret_cast< std::add_pointer_t<Mat>>(_a[1]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
-            using _t = void (ImageCropDialog::*)();
-            if (_t _q_method = &ImageCropDialog::CanReadImageFile; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
+            using _t = void (ImageCropDialog::*)(const Mat & );
+            if (_t _q_method = &ImageCropDialog::CanSetPixmap; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
                 *result = 0;
                 return;
             }
         }
     }
-    (void)_a;
 }
 
 const QMetaObject *ImageCropDialog::metaObject() const
@@ -156,8 +164,9 @@ int ImageCropDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void ImageCropDialog::CanReadImageFile()
+void ImageCropDialog::CanSetPixmap(const Mat & _t1)
 {
-    QMetaObject::activate(this, &staticMetaObject, 0, nullptr);
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 QT_WARNING_POP

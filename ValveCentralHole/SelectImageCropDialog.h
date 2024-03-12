@@ -6,6 +6,8 @@
 #include "CameraConfirmLabel.h"
 #include <QLineEdit>
 #include <QFileDialog>
+#include <QButtonGroup>
+#include <QRadioButton>
 #include <QPushButton>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
@@ -29,13 +31,16 @@ private:
 	std::unique_ptr<QPushButton> reselect_image_btn_;
 	std::unique_ptr<QPushButton> confirm_btn_;
 	std::unique_ptr<QPushButton> reset_btn_;
+	std::unique_ptr<QButtonGroup> image_file_extension_;
+	std::unique_ptr<QRadioButton> jpg_btn_;
+	std::unique_ptr<QRadioButton> png_btn_;
 
 	bool is_reselecting_image_ = false;
 	std::unique_ptr<QFileDialog> file_dialog_;
 
 	std::mutex mutex_;
 	std::condition_variable cv_;
-	bool is_resizing_complete_ = false;
+	bool is_crop_translation_complete_ = false;
 
 	Mat mat_;
 	Mat cropped_;
@@ -48,7 +53,7 @@ public:
 	SelectImageCropDialog(QString image_file_name, QWidget* parent = nullptr);
 
 signals:
-	void IsReadyToDisplayPixmap(Mat mat);
+	void IsReadyToDisplayPixmap(const Mat& mat);
 	void ShouldCloseDialog();
 };
 

@@ -193,3 +193,26 @@ double BinarizeImageHelper::ApplySalineTransformation(double calibration_factor)
 	return calibration_factor;
 }
 
+
+void BinarizeImageHelper::ApplyImageCroppingFromQLabel(const Mat& input, Mat& cropped_output, int crop_x, int crop_y, int crop_width, int crop_height, int label_width, int label_height)
+{
+	// Idea is to get the percentage x, y, width, and height value for the cropped region compared to the QLabel's total width and height
+	// We can then use these percentages to translate the cropped region from the scaled pixmap to the unscaled input mat image, and store the result in cropped_output
+
+	if (input.empty())
+	{
+		return;
+	}
+
+	double percent_x = static_cast<double>(crop_x) / static_cast<double>(label_width);
+	double percent_y = static_cast<double>(crop_y) / static_cast<double>(label_height);
+	double percent_width = static_cast<double>((crop_x + crop_width)) / static_cast<double>(label_width);
+	double percent_height = static_cast<double>((crop_y + crop_height)) / static_cast<double>(label_height);
+
+	int cropped_x = input.cols * percent_x;
+	int cropped_y = input.rows * percent_y;
+	int cropped_width = input.cols * percent_width;
+	int cropped_height = input.rows * percent_height;
+	cropped_output = input(Rect(cropped_x, cropped_y, cropped_width - cropped_x, cropped_height - cropped_y));
+
+}

@@ -16,6 +16,7 @@ private:
 public:
 	CameraConfirmLabel(bool& is_crop_enabled, QWidget* parent = nullptr) : is_crop_enabled_(is_crop_enabled), QLabel(parent) {}
 	void SetCropCallback(const std::function<void(int, int, int, int)>& callback);
+	void SetNewOriginalPixmap(const QPixmap& pixmap);
 	virtual void mousePressEvent(QMouseEvent* event) override;
 	virtual void mouseReleaseEvent(QMouseEvent* event) override;
 	virtual void mouseMoveEvent(QMouseEvent* event) override;
